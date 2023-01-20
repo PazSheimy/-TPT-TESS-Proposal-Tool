@@ -8,8 +8,6 @@ Basic layout
 
 project running.
 ![screenshoot](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/Screenshot%20(1145).png)
-![screenshoot](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/Screenshot%20(1146).png)
-![screenshoot](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/Screenshot%20(1147).png)
-![screenshoot](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/Screenshot%20(1148).png)
+
 
 
