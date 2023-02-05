@@ -1,18 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
-</head>
-<body>
-  <h1>Flask File Uploads Tutorial</h1>
-  <form method="POST" enctype="multipart/form-data">
-    {{form.hidden_tag()}}
-    {{form.file()}}
-    {{form.submit()}}
-  </form>
-  
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>TESS Proposal Tool</title>
+        <link rel="stylesheet" href="/static/style_tess.css">
+        
+        
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="sky-view">
+                <p>"Sky View" sphere, with pan and zoom, able to render points with hover tool tips, and footprints of sectors.</p>
+            </div>
+            <div class="query-container">
+                <div class="search-input">
+                    <form action="/sectors" method="post">
+                        Search Input (RA, Dec, Object Name, or TIC ID): <input type="text" name="search_input"><br>
+                        Search Radius (degrees): <input type="text" name="radius"><br>
+                        <input type="submit" value="Submit">
+                    </form>
+
+                        <label for="sector">Sector: </label>
+                        <input type="number" id="sector" name="sector" placeholder="Input sector number" size="15">
+<!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
+                        <button>Search</button>
+                    </form>
+                </div>
+                <div class="search-method">
+                    <div>
+                        <!-- value='<whatever variable name you want>'  ...this is simply the variable name for the selected search method/radio button -->
+                        <input type="radio" id="method-1" name="query" value="#">
+                        <label for="method-1">e.g., Cyg X-1 or
+                            101.295, -16.699 or
+                            6 45 10.8, -16 41 58, in J2000
+                            TIC ID such as 268644785</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="method-2" name="query" value="#">
+                        <label for="method-2">e.g, Sector 2</label>
+                    </div>
+                </div>
+                <div class="search-csv">
+                    <p>Alternatively, you can search by uploading a CSV file containing coordinates.</p>
+                    <div class="search-csv-buttons">
+                        <!-- TODO: need to add 'accept' attribute to limit which types of files can be uploaded -->
+                        <input type="file">
+                        <!-- TODO: add button functionality so that it retrieves coordinates from the file and then queries them-->
+                        <button>Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-display">
+                <table>
+                    <caption>Target list table view inspector, scrollable table.</caption>
+                        <tr>
+                            <th>Sector</th>
+                            <th>Cycle</th>
+                            <th>Camera</th>
+                        </tr>
+                        {% for result in results %}
+                        <tr>
+                            <td>{{ result[0] }}</td>
+                            <td>{{ result[1] }}</td>
+                            <td>{{ result[2] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                <!-- TODO: add button functionality so data can be downloaded/written to a file -->
+                <button>Download</button>
+            </div>
+            <div class="plot1">
+                <p>(if selecting stars..)Sample HR diagram</p>
+            </div>
+            <div class="plot2">
+                <p>Sample Magnitude Histogram (full sample in grey behind)</p>
+            </div>
+            <div class="plot3">
+                <p>Sample number of sectors observed</p>
+            </div>
+            <div class="plot4">
+                <p>Distance histogram</p>
+            </div>
+            <div class="plot5">
+                <p>Period radius diagram (Optionally if selecting planet candidates..)</p>
+                <p>input box</p>
+                <p>Link dinamic plot box</p>
+                <p>Buttons box</p>
+                <p>Table Display box</p>
+            </div>
+        </div>
+    </body>
 </html>
