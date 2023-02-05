@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>TESS Proposal Tool</title>
+        <link rel="stylesheet" href="style_tess.css">
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="sky-view">
+                <p>"Sky View" sphere, with pan and zoom, able to render points with hover tool tips, and footprints of sectors.</p>
+            </div>
+            <div class="query-container">
+                <div class="search-input">
+                    <!-- Input type will be String. If you want it to be Integer, change type value below to 'number' -->
+                    <input type="text" id="coordinates" name="coordinates" placeholder="Input coordinates here" size="50">
+                    <!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
+                    <button>Search</button>
+                </div>
+                <div class="search-method">
+                    <div>
+                        <!-- value='<whatever variable name you want>'  ...this is simply the variable name for the selected search method/radio button -->
+                        <input type="radio" id="method-1" name="query" value="#">
+                        <label for="method-1">Method 1</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="method-2" name="query" value="#">
+                        <label for="method-2">Method 2</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="method-3" name="query" value="#">
+                        <label for="method-3">Method 3</label>
+                    </div>
+                </div>
+                <div class="search-csv">
+                    <p>Alternatively, you can search by uploading a CSV file containing coordinates.</p>
+                    <div class="search-csv-buttons">
+                        <!-- TODO: need to add 'accept' attribute to limit which types of files can be uploaded -->
+                        <input type="file">
+                        <!-- TODO: add button functionality so that it retrieves coordinates from the file and then queries them-->
+                        <button>Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-display">
+                <table>
+                    <caption>Target list table view inspector, scrollable table.</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Column 1</th>
+                            <th scope="col">Column 2</th>
+                            <th scope="col">Column 3</th>
+                            <th scope="col">Column 4</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Row 1</th>
+                            <td>Row 1 col 2 data</td>
+                            <td>Row 1 col 3 data</td>
+                            <td>Row 1 col 4 data</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Row 2</th>
+                            <td>Row 2 col 2 data</td>
+                            <td>Row 2 col 3 data</td>
+                            <td>Row 2 col 4 data</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Row 3</th>
+                            <td>Row 3 col 2 data</td>
+                            <td>Row 3 col 3 data</td>
+                            <td>Row 3 col 4 data</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- TODO: add button functionality so data can be downloaded/written to a file -->
+                <button>Download</button>
+            </div>
+            <div class="plot1">
+                <p>Linked dynamic plot 1</p>
+            </div>
+            <div class="plot2">
+                <p>Linked dynamic plot 2</p>
+            </div>
+            <div class="plot3">
+                <p>Linked dynamic plot 3</p>
+            </div>
+            <div class="plot4">
+                <p>Linked dynamic plot 4</p>
+            </div>
+        </div>
+    </body>
+</html>
