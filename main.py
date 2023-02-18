@@ -114,15 +114,17 @@ def get_input():
     # call the "sectors" function and store the returned values in variables
     results, ra, dec, object_name, tic_id, coord, sector_number = sectors(search_input, radius)
 
-    luminosity, temperature, star_name, magnitudes = get_metadata(coord, object_name, tic_id)
+    luminosity, temperature, star_name, magnitudes, distance = get_metadata(coord, object_name, tic_id)
 
     # call the "hr_diagram" function and store the returned value in "html"
     html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
 
     html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number) #generate_magnitude_histogram(star_name, magnitudes, sector_num, distance, mass)
     
+    html3 = distance_histogram(star_name, sector_number, distance)
+
     # Render the HTML in a template and return it
-    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2)
+    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3)
 
 def sectors(search_input, radius):
     # initialize variables with None
@@ -249,8 +251,9 @@ def get_metadata(coord, object_name, tic_id):
     luminosity = metadata['lum'] * u.solLum
     temperature = metadata['Teff'] * u.K
     magnitudes = metadata['Tmag']
+    distance = metadata['dstArcSec']
 
-    return luminosity, temperature, star_name, magnitudes
+    return luminosity, temperature, star_name, magnitudes, distance
 
 def hr_diagram(luminosity, temperature, star_name, sector_number):
     # Create a figure with the title HR Diagram for [star_name] (Sector [sector_number])
@@ -284,7 +287,7 @@ def generate_magnitude_histogram(star_name, magnitudes, sector_number):
 
     #Create a Bokeh figure object and add the histogram to it
     p = figure(title=f"{star_name} Magnitude Histogram", x_axis_label='Magnitude', y_axis_label='Frequency')
-    p.quad(top='top', bottom='bottom', left='left', right='right', source=source)
+    p.quad(top='top', bottom='bottom', left='left', right='right', source=source, line_color="#033649")
 
 
     p.xaxis.axis_label = "TESS Magnitude"
@@ -295,6 +298,31 @@ def generate_magnitude_histogram(star_name, magnitudes, sector_number):
     html2 = file_html(p, resources=resources, title=f"Magnitude Histogram for {star_name} (Sector {sector_number})")
 
     return html2
+
+def distance_histogram(star_name, sector_num, distance):
+    # Generate some sample data
+    distances = distance
+    
+    # Create a histogram of the distances
+    hist, edges = np.histogram(distances, bins=50)
+    
+    # Define the data source for the histogram
+    source = ColumnDataSource(data=dict(
+        top=hist,
+        bottom=np.zeros_like(hist),
+        left=edges[:-1],
+        right=edges[1:],
+    ))
+
+    # Create a Bokeh figure object and add the histogram to it
+    p = figure(title="Distance Histogram", x_axis_label='Distance (parsecs)', y_axis_label='Frequency')
+    p.quad(top='top', bottom='bottom', left='left', right='right', source=source, line_color="#033649")
+
+    #shows the histogram of distances with the x-axis showing the distance in parsecs and 
+    #the y-axis showing the frequency of each distance.
+    resources = Resources(mode='cdn')
+    html3 = file_html(p, resources=resources, title=f"Magnitude Histogram for {star_name} (Sector {sector_num})")
+    return html3
 
 
 if __name__ == "__main__":
