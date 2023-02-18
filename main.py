@@ -12,6 +12,8 @@ from bokeh.plotting import figure
 from bokeh.embed import file_html
 from bokeh.resources import CDN
 from bokeh.resources import Resources
+import numpy as np
+from bokeh.models import ColumnDataSource
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -104,12 +106,6 @@ def index():
 #     return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram=html)
 
 
-
-
-
-
-
-
 def get_input():
     # get the values of "search_input" and "radius" from the form data
     search_input = request.form.get("search_input")
@@ -118,11 +114,15 @@ def get_input():
     # call the "sectors" function and store the returned values in variables
     results, ra, dec, object_name, tic_id, coord, sector_number = sectors(search_input, radius)
 
+    luminosity, temperature, star_name, magnitudes = get_metadata(coord, object_name, tic_id)
+
     # call the "hr_diagram" function and store the returned value in "html"
-    html = hr_diagram(coord, sector_number, object_name, tic_id, ra, dec)
+    html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
+
+    html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number) #generate_magnitude_histogram(star_name, magnitudes, sector_num, distance, mass)
     
     # Render the HTML in a template and return it
-    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram=html)
+    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2)
 
 def sectors(search_input, radius):
     # initialize variables with None
@@ -180,35 +180,79 @@ def sectors(search_input, radius):
     return results, ra, dec, object_name, tic_id, coord, sector_number
     
 
-def hr_diagram(coord, sector_number, object_name, tic_id, ra, dec):
+# def hr_diagram(coord, sector_number, object_name, tic_id, ra, dec):
+#     # Check if the input is a coordinate
+#     if coord:
+#         # Download the TESS cutout using the coordinate
+#         tess_cutout = Tesscut.download_cutouts(coordinates=coord, size=5)
+#         # Query the metadata of the star using the coordinate
+#         metadata = Catalogs.query_region(coord, radius=30 * u.arcmin,catalog="Tic")
+#         star_name = f"{coord.ra.degree} {coord.dec.degree}"
+#     # Check if the input is an object name
+#     elif object_name:
+#         # Download the TESS cutout using the object name
+#         tess_cutout = Tesscut.download_cutouts(objectname=object_name, size=5)
+#         # Query the metadata of the star using the object name
+#         metadata = Catalogs.query_object(object_name, catalog="Tic")
+#         star_name = object_name
+#     # Check if the input is a TIC ID
+#     elif tic_id:
+#         # Download the TESS cutout using the TIC ID
+#         tess_cutout = Tesscut.download_cutouts(objectname=tic_id, size=5)
+#         # Query the metadata of the star using the TIC ID
+#         metadata = Catalogs.query_object(tic_id, catalog="Tic")
+#         star_name = "TIC " + tic_id
+#     else:
+#         # Return None if no input is provided
+#         return None
+#     # Retrieve the luminosity and temperature from the metadata
+#     luminosity = metadata['lum'] * u.solLum
+#     temperature = metadata['Teff'] * u.K
+
+#     # Create a figure with the title HR Diagram for [star_name] (Sector [sector_number])
+#     p = figure(title=f"HR Diagram for {star_name} (Sector {sector_number})")
+#     # Add a scatter plot of temperature vs. luminosity to the figure
+#     p.circle(temperature, luminosity.to(u.W))
+#     # Label the x-axis as Temperature (K)
+#     p.xaxis.axis_label = "Temperature (K)"
+#     # Label the y-axis as Lumin
+#     p.yaxis.axis_label = "Luminosity (solLum)"
+
+#     #Set mode of resources to cdn for faster loading
+#     resources = Resources(mode='cdn')
+#     #Create HTML file from figure with specified title
+#     html = file_html(p, resources=resources, title=f"HR Diagram for {star_name} (Sector {sector_number})")
+
+#     return html 
+
+def get_metadata(coord, object_name, tic_id):
     # Check if the input is a coordinate
     if coord:
-        # Download the TESS cutout using the coordinate
-        tess_cutout = Tesscut.download_cutouts(coordinates=coord, size=5)
         # Query the metadata of the star using the coordinate
-        metadata = Catalogs.query_region(coord, radius=30 * u.arcmin,catalog="Tic")
+        metadata = Catalogs.query_region(coord, radius=30 * u.arcmin, catalog="Tic")
         star_name = f"{coord.ra.degree} {coord.dec.degree}"
     # Check if the input is an object name
     elif object_name:
-        # Download the TESS cutout using the object name
-        tess_cutout = Tesscut.download_cutouts(objectname=object_name, size=5)
         # Query the metadata of the star using the object name
         metadata = Catalogs.query_object(object_name, catalog="Tic")
         star_name = object_name
     # Check if the input is a TIC ID
     elif tic_id:
-        # Download the TESS cutout using the TIC ID
-        tess_cutout = Tesscut.download_cutouts(objectname=tic_id, size=5)
         # Query the metadata of the star using the TIC ID
         metadata = Catalogs.query_object(tic_id, catalog="Tic")
         star_name = "TIC " + tic_id
     else:
         # Return None if no input is provided
         return None
+
     # Retrieve the luminosity and temperature from the metadata
     luminosity = metadata['lum'] * u.solLum
     temperature = metadata['Teff'] * u.K
+    magnitudes = metadata['Tmag']
 
+    return luminosity, temperature, star_name, magnitudes
+
+def hr_diagram(luminosity, temperature, star_name, sector_number):
     # Create a figure with the title HR Diagram for [star_name] (Sector [sector_number])
     p = figure(title=f"HR Diagram for {star_name} (Sector {sector_number})")
     # Add a scatter plot of temperature vs. luminosity to the figure
@@ -221,11 +265,36 @@ def hr_diagram(coord, sector_number, object_name, tic_id, ra, dec):
     #Set mode of resources to cdn for faster loading
     resources = Resources(mode='cdn')
     #Create HTML file from figure with specified title
-    html = file_html(p, resources=resources, title=f"HR Diagram for {star_name} (Sector {sector_number})")
+    html1 = file_html(p, resources=resources, title=f"HR Diagram for {star_name} (Sector {sector_number})")
 
-    return html 
+    return html1
+def generate_magnitude_histogram(star_name, magnitudes, sector_number):
+    min_value = np.min(magnitudes)
+    max_value = np.max(magnitudes)
+    hist, edges = np.histogram(magnitudes, bins=200)
     
+    #Define the data source for the histogram
+    source = ColumnDataSource(data=dict(
+        top=hist,
+        bottom=np.zeros_like(hist),
+        left=edges[:-1],
+        right=edges[1:],
+    ))
 
+
+    #Create a Bokeh figure object and add the histogram to it
+    p = figure(title=f"{star_name} Magnitude Histogram", x_axis_label='Magnitude', y_axis_label='Frequency')
+    p.quad(top='top', bottom='bottom', left='left', right='right', source=source)
+
+
+    p.xaxis.axis_label = "TESS Magnitude"
+    p.yaxis.axis_label = "Density"
+
+    # Generate the HTML for the magnitude histogram
+    resources = Resources(mode='cdn')
+    html2 = file_html(p, resources=resources, title=f"Magnitude Histogram for {star_name} (Sector {sector_number})")
+
+    return html2
 
 
 if __name__ == "__main__":
