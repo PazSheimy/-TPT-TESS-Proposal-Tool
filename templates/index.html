@@ -6,8 +6,8 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>TESS Proposal Tool</title>
         <link rel="stylesheet" href="/static/style_tess.css">
-        
-        
+
+
     </head>
     <body>
         <div class="main-container">
@@ -72,33 +72,25 @@
                 <button>Download</button>
             </div>
             <div class="plot1">
-                <p>(if selecting stars..)Sample HR diagram</p>
-                <div style="display: block;">
                     {{ diagram1|safe }}
-                  </div>
             </div>
             <div class="plot2">
-                <p>Sample Magnitude Histogram (full sample in grey behind)</p>
-                <div style="display: block;">
-                    {{ diagram2|safe }}
-                  </div>
-            </div> 
+                {{ diagram2|safe }}
+            </div>
             <div class="plot3">
                 <p>Sample number of sectors observed</p>
             </div>
+
             <div class="plot4">
-                <p>Distance histogram</p>
-                <div style="display: block;">
-                    {{ diagram3|safe }}
-                  </div>
+                {{ diagram3|safe }}
             </div>
-            <div class="plot5">
-                <p>Period radius diagram (Optionally if selecting planet candidates..)</p>
-                <p>input box</p>
-                <p>Link dinamic plot box</p>
-                <p>Buttons box</p>
-                <p>Table Display box</p>
-            </div>
+{#            <div class="plot5">#}
+{#                <p>Period radius diagram (Optionally if selecting planet candidates..)</p>#}
+{#                <p>input box</p>#}
+{#                <p>Link dinamic plot box</p>#}
+{#                <p>Buttons box</p>#}
+{#                <p>Table Display box</p>#}
+{#            </div>#}
         </div>
     </body>
 </html>
