@@ -264,6 +264,9 @@ def hr_diagram(luminosity, temperature, star_name, sector_number):
     p.xaxis.axis_label = "Temperature (K)"
     # Label the y-axis as Lumin
     p.yaxis.axis_label = "Luminosity (solLum)"
+    
+    # how the component should size itself
+    p.sizing_mode = "scale_both"
 
     #Set mode of resources to cdn for faster loading
     resources = Resources(mode='cdn')
@@ -292,6 +295,9 @@ def generate_magnitude_histogram(star_name, magnitudes, sector_number):
 
     p.xaxis.axis_label = "TESS Magnitude"
     p.yaxis.axis_label = "Density"
+    
+    # how the component should size itself
+    p.sizing_mode = "scale_both"
 
     # Generate the HTML for the magnitude histogram
     resources = Resources(mode='cdn')
@@ -317,6 +323,9 @@ def distance_histogram(star_name, sector_num, distance):
     # Create a Bokeh figure object and add the histogram to it
     p = figure(title="Distance Histogram", x_axis_label='Distance (parsecs)', y_axis_label='Frequency')
     p.quad(top='top', bottom='bottom', left='left', right='right', source=source, line_color="#033649")
+    
+    # how the component should size itself
+    p.sizing_mode = "scale_both"
 
     #shows the histogram of distances with the x-axis showing the distance in parsecs and 
     #the y-axis showing the frequency of each distance.
