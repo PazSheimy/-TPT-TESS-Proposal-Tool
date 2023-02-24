@@ -112,7 +112,7 @@ def get_input():
     radius = request.form.get("radius")
 
     # call the "sectors" function and store the returned values in variables
-    results, ra, dec, object_name, tic_id, coord, sector_number = sectors(search_input, radius)
+    results, ra, dec, object_name, tic_id, coord, sector_number, cycle = sectors(search_input, radius)
 
     luminosity, temperature, star_name, magnitudes, distance = get_metadata(coord, object_name, tic_id)
 
@@ -123,8 +123,10 @@ def get_input():
     
     html3 = distance_histogram(star_name, sector_number, distance)
 
+    html4 = sector_graph(object_name, results, cycle)
+
     # Render the HTML in a template and return it
-    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3)
+    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3, diagram4=html4)
 
 def sectors(search_input, radius):
     # initialize variables with None
@@ -179,7 +181,7 @@ def sectors(search_input, radius):
         results.append(result) # Add the list to the results
     
     
-    return results, ra, dec, object_name, tic_id, coord, sector_number
+    return results, ra, dec, object_name, tic_id, coord, sector_number, cycle
     
 
 # def hr_diagram(coord, sector_number, object_name, tic_id, ra, dec):
@@ -332,6 +334,41 @@ def distance_histogram(star_name, sector_num, distance):
     resources = Resources(mode='cdn')
     html3 = file_html(p, resources=resources, title=f"Magnitude Histogram for {star_name} (Sector {sector_num})")
     return html3
+
+
+def sector_graph(object_name, results, cycle):
+    
+    sectors = []
+    cycles = []
+
+    for array in results:
+        sector = array[0]
+        cycle = array[1]
+        sectors.append(sector)
+        cycles.append(cycle)
+
+
+    # Create a ColumnDataSource object with the sector and cycle data
+    source = ColumnDataSource(data=dict(sectors=sectors, cycles=cycles))
+
+    # Create a new plot with a title and axis labels
+    p = figure(title='Observed Sectors', x_axis_label='Sector', y_axis_label='Cycle')
+
+    # Add a scatter plot with the sector and cycle data
+    p.vbar(x='sectors', top='cycles', source=source, width=0.9)
+
+    # Set the chart range for the x-axis and y-axis
+    p.x_range.start = 0
+    p.y_range.start = 0
+    
+    # # how the component should size itself
+    p.sizing_mode = "scale_both"
+
+    #shows the histogram of distances with the x-axis showing the distance in parsecs and 
+    #the y-axis showing the frequency of each distance.
+    resources = Resources(mode='cdn')
+    html4 = file_html(p, resources=resources, title=f"Sectors Observed for {object_name}")
+    return html4
 
 
 if __name__ == "__main__":
