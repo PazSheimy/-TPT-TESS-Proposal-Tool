@@ -292,7 +292,7 @@ def generate_magnitude_histogram(star_name, magnitudes, sector_number):
 
     #Create a Bokeh figure object and add the histogram to it
     p = figure(title=f"{star_name} Magnitude Histogram", x_axis_label='Magnitude', y_axis_label='Frequency')
-    p.quad(top='top', bottom='bottom', left='left', right='right', source=source, line_color="#033649")
+    p.quad(top='top', bottom='bottom', left='left', right='right', source=source)
 
 
     p.xaxis.axis_label = "TESS Magnitude"
@@ -355,7 +355,7 @@ def sector_graph(object_name, results, cycle):
     p = figure(title='Observed Sectors', x_axis_label='Sector', y_axis_label='Cycle')
 
     # Add a scatter plot with the sector and cycle data
-    p.vbar(x='sectors', top='cycles', source=source, width=0.9)
+    p.vbar(x='sectors', top='cycles', source=source, width=0.9, line_color="#033649")
 
     # Set the chart range for the x-axis and y-axis
     p.x_range.start = 0
