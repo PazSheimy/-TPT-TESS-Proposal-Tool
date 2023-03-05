@@ -33,79 +33,6 @@ def index():
     return render_template("index.html")
 
 @app.route("/sectors", methods=["POST"])
-# def sectors():
-#     search_input = request.form.get("search_input")
-#     radius = request.form.get("radius")
-
-#     coord = None
-#     ra = None
-#     dec = None
-#     object_name = None
-#     tic_id = None
-
-#     try:
-#         coord = SkyCoord(search_input, unit = "deg")
-#         ra = coord.ra.degree
-#         dec = coord.dec.degree
-#     except:
-#         if " " in search_input:
-#             try:
-#                 ra, dec = search_input.split(" ")
-#                 coord = SkyCoord(f"{ra} {dec}", unit = "deg")
-#             except:
-#                 pass
-#         if not coord:
-#             if search_input.isdigit():
-#                 tic_id = search_input
-#                 object_name = "TIC " + tic_id
-#             else:
-#                 object_name = search_input
-
-#     if coord:
-#         sectors = Tesscut.get_sectors(coordinates=coord, radius=float(radius)*u.deg)
-#     elif object_name:
-#         sectors = Tesscut.get_sectors(objectname=object_name, radius=float(radius)*u.deg)
-#     elif tic_id:
-#         sectors = Tesscut.get_sectors(objectname=tic_id, radius=float(radius)*u.deg)
-#     else:
-#         return "Error: Please provide either RA and Dec or Object Name or TIC ID."
-
-#     results = []
-#     for sector in sectors:
-#         sector_number = sector['sector']
-#         cycle = (sector_number - 1) // 13 + 1
-#         camera = sector['camera']
-#         result = [sector_number, cycle, camera]
-#         results.append(result)
-
-#      # Get the HR diagram information for the target object
-#     if coord:
-#         tess_cutout = Tesscut.download_cutouts(coordinates=coord, size=5)
-#         metadata = Catalogs.query_region(coord, radius=30 * u.arcmin,catalog="Tic")
-#         star_name = f"{ra} {dec}"
-#     elif object_name:
-#         tess_cutout = Tesscut.download_cutouts(objectname=object_name, size=5)
-#         metadata = Catalogs.query_object(object_name, catalog="Tic")
-#         star_name = object_name
-#     else:
-#         return "Error: Please provide either RA and Dec or Object Name or TIC ID."
-
-
-#     # Extracting the values of the "lum" and "Teff" columns
-#     luminosity = metadata['lum'] * u.solLum
-#     temperature = metadata['Teff'] * u.K
-    
-#     # Create the HR diagram plot
-#     p = figure(title=f"HR Diagram for {star_name} (Sector {sector_number})")
-#     p.circle(temperature, luminosity.to(u.W))
-#     p.xaxis.axis_label = "Temperature (K)"
-#     p.yaxis.axis_label = "Luminosity (solLum)" 
-
-#     resources = Resources(mode='cdn')
-#     html = file_html(p, resources=resources, title=f"HR Diagram for {star_name} (Sector {sector_number})")
-#     return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram=html)
-
-
 def get_input():
     # get the values of "search_input" and "radius" from the form data
     search_input = request.form.get("search_input")
@@ -125,8 +52,10 @@ def get_input():
 
     html4 = sector_graph(object_name, results, cycle)
 
+    #targetsky = skymap()
+
     # Render the HTML in a template and return it
-    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3, diagram4=html4)
+    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3, diagram4=html4)#, target=target
 
 def sectors(search_input, radius):
     # initialize variables with None
@@ -183,51 +112,6 @@ def sectors(search_input, radius):
     
     return results, ra, dec, object_name, tic_id, coord, sector_number, cycle
     
-
-# def hr_diagram(coord, sector_number, object_name, tic_id, ra, dec):
-#     # Check if the input is a coordinate
-#     if coord:
-#         # Download the TESS cutout using the coordinate
-#         tess_cutout = Tesscut.download_cutouts(coordinates=coord, size=5)
-#         # Query the metadata of the star using the coordinate
-#         metadata = Catalogs.query_region(coord, radius=30 * u.arcmin,catalog="Tic")
-#         star_name = f"{coord.ra.degree} {coord.dec.degree}"
-#     # Check if the input is an object name
-#     elif object_name:
-#         # Download the TESS cutout using the object name
-#         tess_cutout = Tesscut.download_cutouts(objectname=object_name, size=5)
-#         # Query the metadata of the star using the object name
-#         metadata = Catalogs.query_object(object_name, catalog="Tic")
-#         star_name = object_name
-#     # Check if the input is a TIC ID
-#     elif tic_id:
-#         # Download the TESS cutout using the TIC ID
-#         tess_cutout = Tesscut.download_cutouts(objectname=tic_id, size=5)
-#         # Query the metadata of the star using the TIC ID
-#         metadata = Catalogs.query_object(tic_id, catalog="Tic")
-#         star_name = "TIC " + tic_id
-#     else:
-#         # Return None if no input is provided
-#         return None
-#     # Retrieve the luminosity and temperature from the metadata
-#     luminosity = metadata['lum'] * u.solLum
-#     temperature = metadata['Teff'] * u.K
-
-#     # Create a figure with the title HR Diagram for [star_name] (Sector [sector_number])
-#     p = figure(title=f"HR Diagram for {star_name} (Sector {sector_number})")
-#     # Add a scatter plot of temperature vs. luminosity to the figure
-#     p.circle(temperature, luminosity.to(u.W))
-#     # Label the x-axis as Temperature (K)
-#     p.xaxis.axis_label = "Temperature (K)"
-#     # Label the y-axis as Lumin
-#     p.yaxis.axis_label = "Luminosity (solLum)"
-
-#     #Set mode of resources to cdn for faster loading
-#     resources = Resources(mode='cdn')
-#     #Create HTML file from figure with specified title
-#     html = file_html(p, resources=resources, title=f"HR Diagram for {star_name} (Sector {sector_number})")
-
-#     return html 
 
 def get_metadata(coord, object_name, tic_id):
     # Check if the input is a coordinate
@@ -369,6 +253,15 @@ def sector_graph(object_name, results, cycle):
     resources = Resources(mode='cdn')
     html4 = file_html(p, resources=resources, title=f"Sectors Observed for {object_name}")
     return html4
+
+# def skymap():
+#     if request.method == "POST":
+#         targetsky = request.form["targetsky"]
+#     else:
+#         targetsky = "Antennae"
+
+   
+#     return targetsky
 
 
 if __name__ == "__main__":
