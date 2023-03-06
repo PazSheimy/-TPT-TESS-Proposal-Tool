@@ -18,13 +18,17 @@
     background-color: grey;
 }
 
-/************************ Sky View ************************/
-.sky-view {
+/************************ Sky Map ************************/
+.sky-map {
     grid-area: 1 / 1 / 3 / 3;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     background-color: #ae90bf;
+}
+
+#aladin-lite-div {
+    height: 100%;
+    width: 100%;
 }
 
 /************************ Query Container ************************/
