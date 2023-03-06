@@ -17,14 +17,12 @@
 <body>
     <div class="main-container">
         <div class="sky-map">
-            <p>"Sky View" sphere, with pan and zoom, able to render points with hover tool tips, and footprints of
-                sectors.</p>
             <form method="post">
                 <label for="target">Target:</label>
                 <input type="text" id="target" name="target" value="{{ target }}">
                 <button type="submit">Submit</button>
             </form>
-            <div id="aladin-lite-div" style="width:100%;height:500px;"></div>
+            <div id="aladin-lite-div"></div>
             <script type="text/javascript">
                 var target = "{{ target }}";
                 var aladin = A.aladin('#aladin-lite-div', { target: target, fov: 0.5, survey: "P/DSS2/color" });
