@@ -32,19 +32,28 @@ class QueryForm(FlaskForm):
 
 @app.route('/csv_upload', methods=['POST'])
 def csv_upload():
-    if request.method == 'POST':
-        radius = request.form['radius']
-        csv_file = request.files.get('csv_file')
-    
-        if csv_file:
-            # If a CSV file was uploaded, process it
-            csv_contents = StringIO(csv_file.read().decode('utf-8'))
-            results = process_csv(csv_contents, radius)
+    radius = request.form.get('radius')
+    csv_file = request.files.get('csv_file')
 
-        download_url = url_for('download', results=results)
-        return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate)
-    else:
-        return render_template('index.html')
+    if not radius:
+        return render_template('index.html', error='Radius value is required')
+
+    try:
+        radius_float = float(radius)
+    except ValueError:
+        return render_template('index.html', error='Invalid radius value')
+
+    if not csv_file:
+        return render_template('index.html', error='CSV file is required')
+
+    try:
+        csv_contents = StringIO(csv_file.read().decode('utf-8'))
+        results = process_csv(csv_contents, radius_float)
+    except Exception as e:
+        return render_template('index.html', error=f'Error processing CSV file: {str(e)}')
+
+    download_url = url_for('download', results=results)
+    return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate)
 
 
 def process_csv(csv_file, radius):
@@ -73,6 +82,16 @@ def get_input():
     search_input = request.form.get("search_input")
     radius = request.form.get("radius")
 
+    # Validate input for search_input and radius
+    if not search_input:
+        return render_template("index.html", error="Please provide a valid search input.")
+    try:
+        radius = float(radius)
+    except ValueError:
+        return render_template("index.html", error="Please provide a valid radius value like 0.5, 1 etc...")
+
+    if radius <= 0:
+        return render_template("index.html", error="Please provide a positive radius value.")
 
     csv_file = request.files.get("csv_file")
     if csv_file:
@@ -82,7 +101,6 @@ def get_input():
     else:
         # Otherwise, process the search input normally
         csv_results = sectors(search_input, radius)
-    
 
     # call the "sectors" function and store the returned values in variables
     results, ra, dec, object_name, tic_id, coord, sector_number, cycle = sectors(search_input, radius)
@@ -92,8 +110,8 @@ def get_input():
     # call the "hr_diagram" function and store the returned value in "html"
     html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
 
-    html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number) #generate_magnitude_histogram(star_name, magnitudes, sector_num, distance, mass)
-    
+    html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number)
+
     html3 = distance_histogram(star_name, sector_number, distance)
 
     html4 = sector_graph(object_name, results, cycle)
