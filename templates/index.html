@@ -43,13 +43,10 @@
 
                 <label for="sector">Sector: </label>
                 <input type="number" id="sector" name="sector" placeholder="Input sector number" size="15">
-                <!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
                 <button>Search</button>
-                </form>
             </div>
             <div class="search-method">
                 <div>
-                    <!-- value='<whatever variable name you want>'  ...this is simply the variable name for the selected search method/radio button -->
                     <input type="radio" id="method-1" name="query" value="#">
                     <label for="method-1">e.g., Cyg X-1 or
                         101.295, -16.699 or
@@ -61,34 +58,60 @@
                     <label for="method-2">e.g, Sector 2</label>
                 </div>
             </div>
-            <div class="search-csv">
-                <p>Alternatively, you can search by uploading a CSV file containing coordinates.</p>
-                <div class="search-csv-buttons">
-                    <!-- TODO: need to add 'accept' attribute to limit which types of files can be uploaded -->
-                    <input type="file">
-                    <!-- TODO: add button functionality so that it retrieves coordinates from the file and then queries them-->
-                    <button>Submit</button>
+            <!-- Move this form tag outside of the form tag for sector search -->
+            <form action="/csv_upload" method="post" enctype="multipart/form-data">
+                <div class="search-csv">
+                    <p>Alternatively, you can search by uploading a CSV file containing coordinates.</p>
+                    <div class="search-csv-buttons">
+                        <input type="file" name="csv_file">
+                        <br><br>
+                        <input type="text" name="radius" placeholder="Enter radius" size="15">
+                        <br><br>
+                        <input type="submit" value="Submit">
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
+
         <div class="table-display">
             <table>
                 <caption>Target list table view inspector, scrollable table.</caption>
-                <tr>
-                    <th>Sector</th>
-                    <th>Cycle</th>
-                    <th>Camera</th>
-                </tr>
-                {% for result in results %}
-                <tr>
-                    <td>{{ result[0] }}</td>
-                    <td>{{ result[1] }}</td>
-                    <td>{{ result[2] }}</td>
-                </tr>
-                {% endfor %}
+                {% if results %}
+                <thead>
+                    <tr>
+                        {% if csv_file %}
+                        <th>RA</th>
+                        <th>Dec</th>
+                        <th>Sector</th>
+                        <th>Camera</th>
+                        <th>Cycle</th>
+                        {% else %}
+                        <th>Sector</th>
+                        <th>Camera</th>
+                        <th>Cycle</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i, result in enumerate(results) %}
+                    <tr>
+                        {% if i == 0 or results[i-1][:2] != result[:2] %}
+                        <td>{{ result[0] }}</td>
+                        <td>{{ result[1] }}</td>
+                        {% else %}
+                        <td></td>
+                        <td></td>
+                        {% endif %}
+
+                        <td>{{ result[2] }}</td>
+                        <td>{{ result[3] }}</td>
+                        <td>{{ result[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% endif %}
             </table>
-            <!-- TODO: add button functionality so data can be downloaded/written to a file -->
-            <button>Download</button>
+            <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
         </div>
         <div class="plot1">
             {{ diagram1|safe }}

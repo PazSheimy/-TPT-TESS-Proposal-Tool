@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response, make_response
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField, StringField, IntegerField
 from werkzeug.utils import secure_filename
@@ -14,6 +14,8 @@ from bokeh.resources import CDN
 from bokeh.resources import Resources
 import numpy as np
 from bokeh.models import ColumnDataSource
+import csv
+from io import StringIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -28,6 +30,39 @@ class QueryForm(FlaskForm):
     sector = IntegerField("Sector", validators=[Optional()])
     submit = SubmitField("Submit Query")
 
+@app.route('/csv_upload', methods=['POST'])
+def csv_upload():
+    if request.method == 'POST':
+        radius = request.form['radius']
+        csv_file = request.files.get('csv_file')
+    
+        if csv_file:
+            # If a CSV file was uploaded, process it
+            csv_contents = StringIO(csv_file.read().decode('utf-8'))
+            results = process_csv(csv_contents, radius)
+
+        download_url = url_for('download', results=results)
+        return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate)
+    else:
+        return render_template('index.html')
+
+
+def process_csv(csv_file, radius):
+    target_results = []
+    reader = csv.reader(csv_file, delimiter=',')
+    for row in reader:
+        # Get the coordinates from the CSV row
+        ra, dec = row[:2]
+        coord = SkyCoord(f"{ra} {dec}", unit="deg")
+        sectors = Tesscut.get_sectors(coordinates=coord, radius=float(radius)*u.deg)
+        for sector in sectors:
+            sector_number = sector['sector']
+            cycle = (sector_number - 1) // 13 + 1
+            camera = sector['camera']
+            target_results.append([coord.ra.deg, coord.dec.deg, sector_number, camera, cycle])
+    return target_results
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -37,6 +72,17 @@ def get_input():
     # get the values of "search_input" and "radius" from the form data
     search_input = request.form.get("search_input")
     radius = request.form.get("radius")
+
+
+    csv_file = request.files.get("csv_file")
+    if csv_file:
+        # If a CSV file was uploaded, process it
+        csv_contents = StringIO(csv_file.read().decode('utf-8'))
+        csv_results = process_csv(csv_contents, radius)
+    else:
+        # Otherwise, process the search input normally
+        csv_results = sectors(search_input, radius)
+    
 
     # call the "sectors" function and store the returned values in variables
     results, ra, dec, object_name, tic_id, coord, sector_number, cycle = sectors(search_input, radius)
@@ -52,10 +98,10 @@ def get_input():
 
     html4 = sector_graph(object_name, results, cycle)
 
-    #targetsky = skymap()
+    download_url = url_for('download')
 
     # Render the HTML in a template and return it
-    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3, diagram4=html4)#, target=target
+    return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1,diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate)
 
 def sectors(search_input, radius):
     # initialize variables with None
@@ -254,14 +300,41 @@ def sector_graph(object_name, results, cycle):
     html4 = file_html(p, resources=resources, title=f"Sectors Observed for {object_name}")
     return html4
 
-# def skymap():
-#     if request.method == "POST":
-#         targetsky = request.form["targetsky"]
-#     else:
-#         targetsky = "Antennae"
+@app.route('/download', methods=['GET','POST'])
+def download():
+    results = request.args.getlist('results')
+    
+    # Create a dictionary to store the data
+    data = {}
+    for result in results:
+        try:
+            ra, dec, sector_number, cycle, camera = map(str.strip, result.split(','))
+            ra = float(ra.strip('[]'))
+            dec = float(dec.strip('[]'))
+            if ra not in data:
+                data[ra] = {}
+            if dec not in data[ra]:
+                data[ra][dec] = []
+            data[ra][dec].append([sector_number, cycle, camera])
+        except ValueError:
+            pass
 
-   
-#     return targetsky
+    # Generate a CSV file from the data
+    csv_data = StringIO()
+    writer = csv.writer(csv_data)
+    writer.writerow(['RA', 'Dec', 'Sector', 'Cycle', 'Camera'])
+    
+    for ra, dec_dict in data.items():
+        for dec, row_list in dec_dict.items():
+            for idx, row in enumerate(row_list):
+                writer.writerow([ra if idx == 0 else '', dec if idx == 0 else '', *row[:-1], row[-1].rstrip(']')])
+
+
+    # Return the CSV data as a response
+    response = make_response(csv_data.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=results.csv'
+    response.headers['Content-Type'] = 'text/csv'
+    return response
 
 
 if __name__ == "__main__":
