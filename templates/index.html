@@ -1,125 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>TESS Proposal Tool</title>
-        <link rel="stylesheet" href="/static/style_tess.css">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
-        <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-        <script src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
-    </head>
-    <body>
-        <div class="main-container">
-            <nav>
-                <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
-                <h1>Welcome to the TESS Proposal Tool</h1>
-                <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
-            </nav>
-            <div class="sky-map">
-                <form id="form-sky" method="post">
-                    <h2>Search Sky Map</h2>
-                    <input type="text" id="target" name="target" value="{{ target }}" placeholder="Target">
-                    <button type="submit">Search</button>
-                </form>
-                <div id="aladin-lite-div"></div>
-                <script type="text/javascript">
-                    var target = "{{ target }}";
-                    var aladin = A.aladin('#aladin-lite-div', { target: target, fov: 0.5, survey: "P/DSS2/color" });
-                    $('form').submit(function (event) {
-                        event.preventDefault();
-                        target = $('#target').val();
-                        aladin.gotoObject(target);
-                    });
-                </script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TESS Proposal Tool</title>
+    <link rel="stylesheet" href="/static/style_tess.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <nav>
+            <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
+            <h1>Welcome to the TESS Proposal Tool</h1>
+            <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
+        </nav>
+        <div class="sky-map">
+            <form id="form-sky" method="post">
+                <h2>Search Sky Map</h2>
+                <label for="target">Target:</label>
+                <input type="text" id="target" name="target" value="{{ target }}">
+                <button type="submit">Search</button>
+            </form>
+            <div id="aladin-lite-div"></div>
+            <script type="text/javascript">
+                var target = "{{ target }}";
+                var aladin = A.aladin('#aladin-lite-div', { target: target, fov: 0.5, survey: "P/DSS2/color" });
+                $('form').submit(function (event) {
+                    event.preventDefault();
+                    target = $('#target').val();
+                    aladin.gotoObject(target);
+                });
+            </script>
+        </div>
+        <div class="query-container">
+            <div class="search-input">
+                <div class="search-input-1">
+                    <h2>Search by RA, Dec, Object Name, TIC ID</h2>
+                    <form action="/sectors" method="post">
+                        <input id="search_input" type="text" name="search_input" placeholder="RA, Dec, Object Name, or TIC ID" size="30">
+                        <input id="radius" type="text" name="radius" placeholder="Radius (degrees)" size="30">
+                        <input type="submit" value="Search">
+                    </form>
+                </div>
+                <div class="search-input-2">
+                    <h2>Search by sector</h2>
+                    <form>
+                        <input type="number" id="sector" name="sector" placeholder="Sector number" size="15">
+                        <!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
+                    <button>Search</button>
+                    </form>
+                </div>
             </div>
-            <div class="query-container">
-                <div class="search-input">
-                    <div class="search-input-1">
-                        <h2>Search by RA, Dec, Object Name, TIC ID</h2>
-                        <form action="/sectors" method="post">
-                            <input id="search_input" type="text" name="search_input" placeholder="RA, Dec, Object Name, or TIC ID" size="30">
-                            <input id="radius" type="text" name="radius" placeholder="Radius (degrees)" size="30">
-                            <input type="submit" value="Search">
-                        </form>
-                    </div>
-                    <div class="search-input-2">
-                        <h2>Search by sector</h2>
-                        <form>
-                            <input type="number" id="sector" name="sector" placeholder="Sector number" size="15">
-                            <!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
-                        <button>Search</button>
-                        </form>
-                    </div>
+            <div class="search-method">
+                <div>
+                    <!-- value='<whatever variable name you want>'  ...this is simply the variable name for the selected search method/radio button -->
+                    <input type="radio" id="method-1" name="query" value="#">
+                    <label for="method-1">e.g., Cyg X-1 or
+                        101.295, -16.699 or
+                        6 45 10.8, -16 41 58, in J2000
+                        TIC ID such as 268644785</label>
                 </div>
-                <div class="search-method">
-                    <div>
-                        <!-- value='<whatever variable name you want>'  ...this is simply the variable name for the selected search method/radio button -->
-                        <input type="radio" id="method-1" name="query" value="#">
-                        <label for="method-1">e.g., Cyg X-1 or
-                            101.295, -16.699 or
-                            6 45 10.8, -16 41 58, in J2000
-                            TIC ID such as 268644785</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="method-2" name="query" value="#">
-                        <label for="method-2">e.g, Sector 2</label>
-                    </div>
+                <div>
+                    <input type="radio" id="method-2" name="query" value="#">
+                    <label for="method-2">e.g, Sector 2</label>
                 </div>
+            </div>
+            <form action="/csv_upload" method="post" enctype="multipart/form-data">
                 <div class="search-csv">
                     <h2>Alternatively, you can search by uploading a CSV file containing coordinates.</h2>
                     <div class="search-csv-buttons">
-                        <!-- TODO: need to add 'accept' attribute to limit which types of files can be uploaded -->
-                        <input type="file">
-                        <!-- TODO: add button functionality so that it retrieves coordinates from the file and then queries them-->
-                        <button>Submit</button>
+                        <input type="file" name="csv_file">
+                        <br><br>
+                        <input type="text" name="radius" placeholder="Enter radius" size="15">
+                        <br><br>
+                        <input type="submit" value="Submit">
                     </div>
                 </div>
-            </div>
-            <div class="table-display">
-                <table>
-                    <caption>Query Results</caption>
-                    {% if results %}
-                    <thead>
-                        <tr>
-                            {% if csv_file %}
-                                <th>RA</th>
-                                <th>Dec</th>
-                                <th>Sector</th>
-                                <th>Camera</th>
-                                <th>Cycle</th>
-                            {% else %}
-                                <th>RA</th>
-                                <th>Dec</th>
-                                <th>Sector</th>
-                                <th>Camera</th>
-                                <th>Cycle</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i, result in enumerate(results) %}
-                        <tr>
-                            {% if i == 0 or results[i-1][:2] != result[:2] %}
-                            <td>{{ result[0] }}</td>
-                            <td>{{ result[1] }}</td>
-                            {% else %}
-                            <td></td>
-                            <td></td>
-                            {% endif %}
+            </form>
+        </div>
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
 
-                            <td>{{ result[2] }}</td>
-                            <td>{{ result[3] }}</td>
-                            <td>{{ result[4] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+        <div class="table-display">
+            <table>
+                <caption>Query Results</caption>
+                {% if results %}
+                <thead>
+                    <tr>
+                        {% if csv_file %}
+                            <th>RA</th>
+                            <th>Dec</th>
+                            <th>Sector</th>
+                            <th>Camera</th>
+                            <th>Cycle</th>
+                        {% else %}
+                            <th>RA</th>
+                            <th>Dec</th> 
+                            <th>Sector</th>
+                            <th>Camera</th>
+                            <th>Cycle</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i, result in enumerate(results) %}
+                    <tr>
+                        {% if i == 0 or results[i-1][:2] != result[:2] %}
+                        <td>{{ result[0] }}</td>
+                        <td>{{ result[1] }}</td>
+                        {% else %}
+                        <td></td>
+                        <td></td>
+                        {% endif %}
+                        <td>{{ result[2] }}</td>
+                        <td>{{ result[3] }}</td>
+                        <td>{{ result[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
                 {% endif %}
-                </table>
-                <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
+            </table>
+            <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
             </div>
             <div class="plot1">
                 {{ diagram1|safe }}
