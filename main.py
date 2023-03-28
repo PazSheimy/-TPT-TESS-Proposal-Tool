@@ -30,45 +30,70 @@ class QueryForm(FlaskForm):
     sector = IntegerField("Sector", validators=[Optional()])
     submit = SubmitField("Submit Query")
 
+# Route for handling POST requests to upload a CSV file
 @app.route('/csv_upload', methods=['POST'])
 def csv_upload():
+    
+    # Get the value of the radius parameter from the request form
     radius = request.form.get('radius')
+    
+    # Get the uploaded CSV file from the request files
     csv_file = request.files.get('csv_file')
-
+    
+    # Check if a radius value was provided
     if not radius:
+        # If not, return an error message to the index.html template
         return render_template('index.html', error='Radius value is required')
-
+    
+    # Attempt to convert the radius to a float value
     try:
         radius_float = float(radius)
     except ValueError:
+        # If the conversion fails, return an error message to the index.html template
         return render_template('index.html', error='Invalid radius value')
-
+    
+    # Check if a CSV file was provided
     if not csv_file:
+        # If not, return an error message to the index.html template
         return render_template('index.html', error='CSV file is required')
-
+    
     try:
+        # Read the contents of the CSV file into a StringIO object and decode it as UTF-8
         csv_contents = StringIO(csv_file.read().decode('utf-8'))
+        
+        # Call the process_csv function with the CSV contents and the provided radius
         results = process_csv(csv_contents, radius_float)
     except Exception as e:
+        # If there is an error processing the CSV file, return an error message to the index.html template
         return render_template('index.html', error=f'Error processing CSV file: {str(e)}')
-
+    
+    # Generate a URL for the download route and render the index.html template with the results and download URL
     download_url = url_for('download', results=results)
     return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate)
 
 
 def process_csv(csv_file, radius):
+    # Create an empty list to store the results
     target_results = []
+    # Use the built-in csv module to read the csv_file
     reader = csv.reader(csv_file, delimiter=',')
+    # Iterate over each row in the csv_file
     for row in reader:
-        # Get the coordinates from the CSV row
+        # Get the right ascension and declination from the row
         ra, dec = row[:2]
+        # Use the SkyCoord object from the astropy.coordinates module to create a coordinate object
         coord = SkyCoord(f"{ra} {dec}", unit="deg")
+        # Use the TESScut.get_sectors() function to get the TESS sectors that intersect with the given coordinate and radius
         sectors = Tesscut.get_sectors(coordinates=coord, radius=float(radius)*u.deg)
+        # Iterate over each sector that intersects with the given coordinate and radius
         for sector in sectors:
+            # Get the sector number, cycle number, and camera number for the sector
             sector_number = sector['sector']
             cycle = (sector_number - 1) // 13 + 1
             camera = sector['camera']
+            # Append the results to the target_results list
             target_results.append([coord.ra.deg, coord.dec.deg, sector_number, camera, cycle])
+    # Return the target_results list
     return target_results
 
 
@@ -105,17 +130,22 @@ def get_input():
     # call the "sectors" function and store the returned values in variables
     results, ra, dec, object_name, tic_id, coord, sector_number, cycle = sectors(search_input, radius)
 
+    # call the "get_metadata" function and store the returned values in variables
     luminosity, temperature, star_name, magnitudes, distance = get_metadata(coord, object_name, tic_id)
 
-    # call the "hr_diagram" function and store the returned value in "html"
+    # call the "hr_diagram" function and store the returned value in "html1"
     html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
 
+    # call the "generate_magnitude_histogram" function and store the returned value in "html2"
     html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number)
 
+    # call the "distance_histogram" function and store the returned value in "html3"
     html3 = distance_histogram(star_name, sector_number, distance)
 
+    # call the "sector_graph" function and store the returned value in "html4"
     html4 = sector_graph(object_name, results, cycle)
-
+    
+    # To download the csv result file
     download_url = url_for('download')
 
     # Render the HTML in a template and return it
@@ -357,6 +387,4 @@ def download():
 
 if __name__ == "__main__":
     app.run(debug=True)  
-
-
 
