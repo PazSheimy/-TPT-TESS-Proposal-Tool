@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+}
+
+.main-container {
+    display: grid;
+    /*grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr);*/
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: .25fr repeat(2, .5fr) 1fr;
+    grid-column-gap: 0;
+    grid-row-gap: 0;
+    background-image: linear-gradient(to bottom, #09203f, #1b3454, #2d4a69, #3f607f, #537895);
+}
+
+h2,
+caption {
+    font-size: 1.2rem;
+    color: white;
+}
+
+
+/************************ Main Header / Nav ************************/
+nav {
+    grid-area: 1 / 1 / 2 / 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo,
+#satellite {
+    width: 10%;
+    height: auto;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-right: 20px;
+    color: white;
+    text-align: center;
+}
+
+
+/************************ Sky Map ************************/
+.sky-map {
+    grid-area: 2 / 1 / 4 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#aladin-lite-div {
+    height: 500px;
+    width: 500px;
+}
+
+#form-sky {
+    margin-bottom: 20px;
+}
+
+
+/************************ Query Container ************************/
+.query-container {
+    grid-area: 2 / 3 / 3 / 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.search-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.search-input-1 {
+    margin-bottom: 15px;
+}
+
+input {
+    outline: none;
+}
+
+.search-method {
+    display: flex;
+    align-items: flex-start;
+
+}
+
+.search-method div {
+    margin: 0 12px;
+}
+
+.search-csv {
+    margin-top: 30px;
+}
+
+.search-csv-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.search-csv p {
+    margin-bottom: 10px;
+}
+
+
+/************************ Target List Table ************************/
+.table-display {
+    grid-area: 3 / 3 / 4 / 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+table {
+    table-layout: fixed;
+    width: 50%;
+    border-collapse: collapse;
+    margin: 5px;
+    max-height: 100%;
+}
+
+caption {
+    margin-bottom: 10px;
+}
+
+tbody {
+    display: block;
+    overflow-y: scroll;
+    width: 100%;
+}
+
+thead tr {
+    display: block;
+}
+
+th,
+td {
+    background-color: rgba(255,255,255,.2);
+    width: 200px;
+}
+
+th,
+thead {
+    background-color: #1f3e80;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+tbody td {
+    text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #ccd1d1 ;
+}
+
+
+/************************ Linked Dynamic Plots ************************/
+.plot1 {
+    grid-area: 4 / 1 / 5 / 2;
+    align-self: center;
+    margin: 2px;
+}
+
+.plot2 {
+    grid-area: 4 / 2 / 5 / 3;
+    align-self: center;
+    margin: 2px;
+}
+
+.plot3 {
+    grid-area: 4 / 3 / 5 / 4;
+    align-self: center;
+    margin: 2px;
+}
+
+.plot4 {
+    grid-area: 4 / 4 / 5 / 5;
+    align-self: center;
+    margin: 2px;
+}
+
+
+/************************ Media Queries ************************/
+@media only screen and (max-width: 1300px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2,
+    caption {
+        font-size: 1.1rem;
+    }
+
+    #aladin-lite-div {
+        height: 300px;
+        width: 300px;
+    }
+
+    .search-input-1 input[type="text"] {
+        width: 200px;
+    }
+
+    .search-csv {
+        width: 80%;
+    }
+
+    .search-csv h2 {
+        text-align: left;
+    }
+
+}
+
+/*@media only screen and (min-height: 500px) {*/
+/*    .main-container {*/
+/*        height: 100%;*/
+/*    }*/
+/*}*/
