@@ -17,6 +17,7 @@ from bokeh.models import ColumnDataSource
 import csv
 from io import StringIO
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = 'static/files'
@@ -128,7 +129,7 @@ def get_input():
         csv_results = sectors(search_input, radius)
 
     # call the "sectors" function and store the returned values in variables
-    results, ra, dec, object_name, tic_id, coord, sector_number, cycle = sectors(search_input, radius)
+    results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date = sectors(search_input, radius)
 
     # call the "get_metadata" function and store the returned values in variables
     luminosity, temperature, star_name, magnitudes, distance = get_metadata(coord, object_name, tic_id)
@@ -187,24 +188,30 @@ def sectors(search_input, radius):
     # Query the sectors based on the type of the input (coord, object_name, or tic_id)
     if coord:
         sectors = Tesscut.get_sectors(coordinates=coord, radius=float(radius)*u.deg)
+        cutouts = Tesscut.get_cutouts(coordinates=coord)
     elif object_name:
         sectors = Tesscut.get_sectors(objectname=object_name, radius=float(radius)*u.deg)
+        cutouts = Tesscut.get_cutouts(coordinates=object_name)
     elif tic_id:
         sectors = Tesscut.get_sectors(objectname=tic_id, radius=float(radius)*u.deg)
+        cutouts = Tesscut.get_cutouts(coordinates=tic_id)
+        
     else:
         return "Error: Please provide either RA and Dec or Object Name or TIC ID."
 
     # create a list of results and store sector number, cycle, and camera for each sector
     results = []
-    for sector in sectors:
-        sector_number = sector['sector'] # Retrieve the sector number
+    for sector, cutout in zip(sectors, cutouts):
+        sector_number = sector['sector'] # Retrieve the sector number from the sectors list
         cycle = (sector_number - 1) // 13 + 1 # Calculate the cycle number
-        camera = sector['camera'] # Retrieve the camera information
-        result = [sector_number, cycle, camera] # Combine the information into a list
+        camera = sector['camera'] # Retrieve the camera information from the sectors list
+        obs_date = cutout[0].header['DATE-OBS'] # Retrieve the observation date from the header of the first TPF in the cutout list
+        result = [sector_number, cycle, camera, obs_date] # Combine the information into a list
         results.append(result) # Add the list to the results
+
     
     
-    return results, ra, dec, object_name, tic_id, coord, sector_number, cycle
+    return results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date
     
 
 def get_metadata(coord, object_name, tic_id):

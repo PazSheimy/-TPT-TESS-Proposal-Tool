@@ -76,7 +76,7 @@
                     <div class="search-csv-buttons">
                         <input type="file" name="csv_file">
                         <br><br>
-                        <input type="text" name="radius" placeholder="Enter radius" size="15">
+                        <input id="radius" type="text" name="radius" placeholder="Radius (degrees)" size="30">
                         <br><br>
                         <input type="submit" value="Submit">
                     </div>
@@ -89,7 +89,7 @@
 
         <div class="table-display">
             <table>
-                <caption>Query Results</caption>
+                <h2>Query Results</h2>
                 {% if results %}
                 <thead>
                     <tr>
@@ -99,11 +99,14 @@
                             <th>Sector</th>
                             <th>Camera</th>
                             <th>Cycle</th>
+                            <th>Observation Date</th>
+
                         {% else %}
                             
                             <th>Sector</th>
                             <th>Camera</th>
                             <th>Cycle</th>
+                            <th>Observation Date</th>
                         {% endif %}
                     </tr>
                 </thead>
@@ -120,6 +123,8 @@
                         <td>{{ result[2] }}</td>
                         <td>{{ result[3] }}</td>
                         <td>{{ result[4] }}</td>
+                        <td>{{ result[5] }}</td>
+                        
                     </tr>
                     {% endfor %}
                 </tbody>
