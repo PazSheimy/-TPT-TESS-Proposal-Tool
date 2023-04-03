@@ -18,19 +18,15 @@ from bokeh.models import ColumnDataSource
 import csv
 from io import StringIO
 import requests.exceptions
-#import csv_handle
-
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = 'static/files'
 
-
 class UploadFileForm(FlaskForm):
     file = FileField("File", validators=[InputRequired()])
     submit = SubmitField("Upload File")
-
 
 class QueryForm(FlaskForm):
     query = StringField("Query", validators=[InputRequired()])
@@ -38,7 +34,6 @@ class QueryForm(FlaskForm):
     submit = SubmitField("Submit Query")
 
 # Route for handling POST requests to upload a CSV file
-
 @app.route('/csv_upload', methods=['POST'])
 def csv_upload():
 
@@ -77,7 +72,7 @@ def csv_upload():
 
     # Generate a URL for the download route and render the index.html template with the results and download URL
     download_url = url_for('download', results=results)
-    return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate)
+    return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate, csv_file=csv_file)
 
 
 def process_csv(csv_file, radius):
@@ -110,21 +105,18 @@ def process_csv(csv_file, radius):
     # Return the target_results list
     return target_results
 
-
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-
-
 @app.route("/sectors", methods=["POST"])
 def get_input():
+    sector_number = None
     # get the values of "search_input" and "radius" from the form data
     search_input = request.form.get("search_input")
     radius = request.form.get("radius")
+    sector_selection = request.form.get("sector")
 
     # Validate input for search_input and radius
     if not search_input:
@@ -144,12 +136,22 @@ def get_input():
         csv_results = process_csv(csv_contents, radius)
     else:
         # Otherwise, process the search input normally
-        csv_results = sectors(search_input, radius)
+        csv_results = sectors(search_input, radius,sector_number)
+
+    if sector_selection:
+        # If the user provided a sector number, use it
+        try:
+            sector_number = int(sector_selection)
+        except ValueError:
+            return render_template("index.html", error="Please provide a valid sector number.")
+    else:
+        # Otherwise, use the default sector number
+        sector_number = None
 
     # call the "sectors" function and store the returned values in variables
     try:
         results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date = sectors(
-            search_input, radius)
+            search_input, radius, sector_number=sector_number)
         # call the "get_metadata" function and store the returned values in variables
         luminosity, temperature, star_name, magnitudes, distance = get_metadata(
             coord, object_name, tic_id)
@@ -170,13 +172,13 @@ def get_input():
         download_url = url_for('download')
 
         # Render the HTML in a template and return it
-        return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate)
+        return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate, csv_file=csv_file)
 
     except requests.exceptions.ConnectTimeout:
         return render_template("index.html", error="The connection to the MAST API timed out. Please try again later.")
 
 
-def sectors(search_input, radius):
+def sectors(search_input, radius,sector_number):
     try:
         sectors = Tesscut.get_sectors(coordinates=search_input, radius=radius)
     except ResolverError:
@@ -190,6 +192,7 @@ def sectors(search_input, radius):
     dec = None
     object_name = None
     tic_id = None
+    sector_number = None
 
     # try to convert the search_input into a SkyCoord object
     try:
@@ -249,7 +252,6 @@ def sectors(search_input, radius):
         # Combine the information into a list
         result = [sector_number, cycle, camera, obs_date]
         results.append(result)  # Add the list to the results
-
     return results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date
 
 
@@ -371,7 +373,6 @@ def distance_histogram(star_name, sector_num, distance):
 
 
 def sector_graph(object_name, results, cycle):
-
     sectors = []
     cycles = []
 

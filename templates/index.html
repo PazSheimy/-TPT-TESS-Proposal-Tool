@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
     <script src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
 </head>
+
 <body>
     <div class="main-container">
         <nav>
@@ -40,20 +42,15 @@
         <div class="query-container">
             <div class="search-input">
                 <div class="search-input-1">
-                    <h2>Search by RA, Dec, Object Name, TIC ID</h2>
+                    <h2>Search by RA, Dec, Object Name, TIC ID, and sector</h2>
                     <form action="/sectors" method="post">
-                        <input id="search_input" type="text" name="search_input" placeholder="RA, Dec, Object Name, or TIC ID" size="30">
-                        <input id="radius" type="text" name="radius" placeholder="Radius (degrees)" size="30">
+                        <input type="text" id="search_input" name="search_input"
+                            placeholder="RA, Dec, Object Name, or TIC ID" size="30" required>
+                        <input type="text" id="radius" name="radius" placeholder="Radius (degrees)" size="30" required>
+                        <input type="number" id="sector" name="sector" placeholder="Sector number (optional)" size="15">
                         <input type="submit" value="Search">
                     </form>
-                </div>
-                <div class="search-input-2">
-                    <h2>Search by sector</h2>
-                    <form>
-                        <input type="number" id="sector" name="sector" placeholder="Sector number" size="15">
-                        <!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
-                    <button>Search</button>
-                    </form>
+
                 </div>
             </div>
             <div class="search-method">
@@ -94,20 +91,18 @@
                 <thead>
                     <tr>
                         {% if csv_file %}
-                            <th>RA</th>
-                            <th>Dec</th>
-                            <th>Sector</th>
-                            <th>Camera</th>
-                            <th>Cycle</th>
-                            <th>Observation Date</th>
+                        <th>RA</th>
+                        <th>Dec</th>
+                        <th>Sector</th>
+                        <th>Camera</th>
+                        <th>Cycle</th>
+                        <th>Observation Date</th>
 
                         {% else %}
-                            <th>RA</th>
-                            <th>Dec</th>
-                            <th>Sector</th>
-                            <th>Camera</th>
-                            <th>Cycle</th>
-                            <th>Observation Date</th>
+                        <th>Sector</th>
+                        <th>Camera</th>
+                        <th>Cycle</th>
+                        <th>Observation Date</th>
                         {% endif %}
                     </tr>
                 </thead>
@@ -125,26 +120,27 @@
                         <td>{{ result[3] }}</td>
                         <td>{{ result[4] }}</td>
                         <td>{{ result[5] }}</td>
-                        
+
                     </tr>
                     {% endfor %}
                 </tbody>
                 {% endif %}
             </table>
             <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
-            </div>
-            <div class="plot1">
-                {{ diagram1|safe }}
-            </div>
-            <div class="plot2">
-                {{ diagram2|safe }}
-            </div>
-            <div class="plot3">
-                {{ diagram4|safe }}
-            </div>
-            <div class="plot4">
-                {{ diagram3|safe }}
-            </div>
         </div>
-    </body>
+        <div class="plot1">
+            {{ diagram1|safe }}
+        </div>
+        <div class="plot2">
+            {{ diagram2|safe }}
+        </div>
+        <div class="plot3">
+            {{ diagram4|safe }}
+        </div>
+        <div class="plot4">
+            {{ diagram3|safe }}
+        </div>
+    </div>
+</body>
+
 </html>
