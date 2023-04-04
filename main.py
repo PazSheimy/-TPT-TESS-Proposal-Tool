@@ -105,9 +105,13 @@ def process_csv(csv_file, radius):
     # Return the target_results list
     return target_results
 
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # sets <table> container visibility to 'hidden' upon page load
+    table_visibility = 'hidden'
+
+    return render_template("index.html", table_visibility=table_visibility)
 
 
 @app.route("/sectors", methods=["POST"])
@@ -171,8 +175,11 @@ def get_input():
         # To download the csv result file
         download_url = url_for('download')
 
+        # sets <table> visibility to 'visible' once query results are received
+        table_visibility = 'visible'
+
         # Render the HTML in a template and return it
-        return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate, csv_file=csv_file)
+        return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate, table_visibility=table_visibility)
 
     except requests.exceptions.ConnectTimeout:
         return render_template("index.html", error="The connection to the MAST API timed out. Please try again later.")
@@ -448,3 +455,4 @@ def download():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
