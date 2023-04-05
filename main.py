@@ -178,7 +178,11 @@ def get_input():
         # sets <table> visibility to 'visible' once query results are received
         table_visibility = 'visible'
 
+        # sets <table> visibility to 'visible' once query results are received
+        table_visibility = 'visible'
+
         # Render the HTML in a template and return it
+        return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate, table_visibility=table_visibility)
         return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate, table_visibility=table_visibility)
 
     except requests.exceptions.ConnectTimeout:
