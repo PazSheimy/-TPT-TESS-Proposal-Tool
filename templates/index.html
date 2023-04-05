@@ -44,15 +44,8 @@
                         <form action="/sectors" method="post">
                             <input id="search_input" type="text" name="search_input" placeholder="RA, Dec, Object Name, or TIC ID" size="30">
                             <input class="input-radius" id="radius" type="text" name="radius" placeholder="Radius (degrees)">
+                            <input type="number" id="sector" name="sector" placeholder="Sector number (optional)" size="15">
                             <input type="submit" value="Search">
-                        </form>
-                    </div>
-                    <div class="search-input-2">
-                        <h2>Search by sector</h2>
-                        <form>
-                            <input type="number" id="sector" name="sector" placeholder="Sector number" size="15">
-                            <!-- TODO: Button currently has no functionality. Need to create function that checks which radio button has been selected and then makes the corresponding query. -->
-                        <button>Search</button>
                         </form>
                     </div>
                 </div>

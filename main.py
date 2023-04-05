@@ -438,7 +438,7 @@ def download():
     # Generate a CSV file from the data
     csv_data = StringIO()
     writer = csv.writer(csv_data)
-    writer.writerow(['RA', 'Dec', 'Sector', 'Cycle', 'Camera', 'Observation Date'])
+    writer.writerow(['RA', 'Dec', 'Sector', 'Camera', 'Cycle', 'Observation Date'])
 
     for ra, dec_dict in data.items():
         for dec, row_list in dec_dict.items():
