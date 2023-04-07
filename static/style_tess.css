@@ -115,12 +115,8 @@ input {
 .input-radius {
     width: 150px;
 }
-.input-radius {
-    width: 150px;
-}
 
 /************************ Target List Table ************************/
-.results-container {
 .results-container {
     grid-area: 3 / 3 / 4 / 5;
     display: flex;
@@ -135,15 +131,7 @@ input {
     margin: 5px;
 }
 
-.table-container {
-    max-height: 400px;
-    overflow-y: scroll;
-    margin: 5px;
-}
-
 table {
-    table-layout: auto;
-    width: 75%;
     table-layout: auto;
     width: 75%;
     border-collapse: collapse;
@@ -152,8 +140,6 @@ table {
 th,
 td {
     background-color: rgba(255,255,255,.2);
-    border: 1px solid black;
-	padding: 8px;
     border: 1px solid black;
 	padding: 8px;
 }
@@ -165,13 +151,10 @@ thead {
     font-weight: bold;
     position: sticky;
     top: 0;
-    position: sticky;
-    top: 0;
 }
 
 tbody td {
     text-align: center;
-
 
 }
 
