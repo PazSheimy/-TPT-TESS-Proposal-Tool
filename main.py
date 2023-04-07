@@ -18,6 +18,8 @@ from bokeh.models import ColumnDataSource
 import csv
 from io import StringIO
 import requests.exceptions
+from requests.exceptions import ConnectionError
+
 
 
 app = Flask(__name__)
@@ -114,93 +116,87 @@ def index():
     return render_template("index.html", table_visibility=table_visibility)
 
 
+#function to validate inputs
+def validate_inputs(search_input, radius, sector_selection):
+    if not search_input:
+        return False, "Please provide a valid search input."
+    
+    try:
+        radius = float(radius)
+    except ValueError:
+        return False, "Please provide a valid radius value like 0.5, 1 etc..."
+    
+    if radius <= 0:
+        return False, "Please provide a positive radius value."
+
+    try:
+        sector_number = int(sector_selection) if sector_selection else None
+    except ValueError:
+        return False, "Please provide a valid sector number."
+    
+    return True, (search_input, radius, sector_number)
+
 @app.route("/sectors", methods=["POST"])
 def get_input():
-    sector_number = None
-    # get the values of "search_input" and "radius" from the form data
     search_input = request.form.get("search_input")
     radius = request.form.get("radius")
     sector_selection = request.form.get("sector")
 
-    # Validate input for search_input and radius
-    if not search_input:
-        return render_template("index.html", error="Please provide a valid search input.")
+    is_valid, validation_result = validate_inputs(search_input, radius, sector_selection)
+
+    if not is_valid:
+        return render_template("index.html", error=validation_result)
+    
+    search_input, radius, sector_number = validation_result
+
     try:
-        radius = float(radius)
-    except ValueError:
-        return render_template("index.html", error="Please provide a valid radius value like 0.5, 1 etc...")
-
-    if radius <= 0:
-        return render_template("index.html", error="Please provide a positive radius value.")
-
-    csv_file = request.files.get("csv_file")
-    if csv_file:
-        # If a CSV file was uploaded, process it
-        csv_contents = StringIO(csv_file.read().decode('utf-8'))
-        csv_results = process_csv(csv_contents, radius)
-    else:
-        # Otherwise, process the search input normally
-        csv_results = sectors(search_input, radius,sector_number)
-
-    if sector_selection:
-        # If the user provided a sector number, use it
-        try:
-            sector_number = int(sector_selection)
-        except ValueError:
-            return render_template("index.html", error="Please provide a valid sector number.")
-    else:
-        # Otherwise, use the default sector number
-        sector_number = None
-
-    # call the "sectors" function and store the returned values in variables
-    try:
-        results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date = sectors(
-            search_input, radius, sector_number=sector_number)
-        # call the "get_metadata" function and store the returned values in variables
-        luminosity, temperature, star_name, magnitudes, distance = get_metadata(
-            coord, object_name, tic_id)
-
-        # call the "hr_diagram" function and store the returned value in "html1"
-        html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
-
-        # call the "generate_magnitude_histogram" function and store the returned value in "html2"
-        html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number)
-
-        # call the "distance_histogram" function and store the returned value in "html3"
-        html3 = distance_histogram(star_name, sector_number, distance)
-
-        # call the "sector_graph" function and store the returned value in "html4"
-        html4 = sector_graph(object_name, results, cycle)
-
-        # To download the csv result file
-        download_url = url_for('download')
-
-        # sets <table> visibility to 'visible' once query results are received
-        table_visibility = 'visible'
-
-        # Render the HTML in a template and return it
-        return render_template("index.html", results=results, star_name=object_name, sector_num=sector_number, diagram1=html1, diagram2=html2, diagram3=html3, diagram4=html4, csv_results=csv_results, download_url=download_url, enumerate=enumerate, table_visibility=table_visibility)
-
+        processed_data = process_data(search_input, radius, sector_number)
+        return render_template("index.html", **processed_data)
     except requests.exceptions.ConnectTimeout:
         return render_template("index.html", error="The connection to the MAST API timed out. Please try again later.")
 
+def process_data(search_input, radius, sector_number):
+    all_results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date = sectors(
+        search_input, radius, sector_number)
+    luminosity, temperature, star_name, magnitudes, distance = get_metadata(
+        coord, object_name, tic_id)
 
-def sectors(search_input, radius,sector_number):
-    try:
-        sectors = Tesscut.get_sectors(coordinates=search_input, radius=radius)
-    except ResolverError:
-        # Display an error message to the user and prompt them to try again
-        return "Could not resolve input to a sky position. Please try again with a different input."
+    # Filter the results based on the entered sector number
+    if sector_number is not None:
+        filtered_results = [result for result in all_results if result[0] == int(sector_number)]
+    else:
+        filtered_results = all_results
 
+    sector_graphs = generate_sector_graphs(object_name, all_results)
 
-    # initialize variables with None
-    coord = None
-    ra = None
-    dec = None
-    object_name = None
-    tic_id = None
-    sector_number = None
+    # Generate sector graphs for all the results
+    sector_graphs = generate_sector_graphs(object_name, all_results)
 
+    html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
+    html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number)
+    html3 = distance_histogram(star_name, sector_number, distance)
+    html4 = sector_graph(object_name, all_results, cycle)
+    download_url = url_for('download')
+
+    # sets <table> visibility to 'visible' once query results are received
+    table_visibility = 'visible'
+
+    return {
+        "results": filtered_results,
+        "star_name": object_name,
+        "sector_num": sector_number,
+        "diagram1": html1,
+        "diagram2": html2,
+        "diagram3": html3,
+        "diagram4": html4,
+        "sector_graphs": sector_graphs,
+        "download_url": download_url,
+        "enumerate": enumerate,
+        "table_visibility": table_visibility,
+    }
+
+def resolve_input(search_input):
+    coord, ra, dec, object_name, tic_id = None, None, None, None, None
     # try to convert the search_input into a SkyCoord object
     try:
         coord = SkyCoord(search_input, unit="deg")
@@ -229,6 +225,10 @@ def sectors(search_input, radius,sector_number):
             # if the input is not ra/dec, object name or tic id, return an error message
             return "Error: Please enter a correct input (RA/Dec, object name, or TIC ID)."
 
+    return coord, ra, dec, object_name, tic_id
+
+
+def query_sectors(coord, object_name, tic_id, radius):
     # Query the sectors based on the type of the input (coord, object_name, or tic_id)
     if coord:
         sectors = Tesscut.get_sectors(
@@ -242,24 +242,52 @@ def sectors(search_input, radius,sector_number):
         sectors = Tesscut.get_sectors(
             objectname=tic_id, radius=float(radius)*u.deg)
         cutouts = Tesscut.get_cutouts(coordinates=tic_id)
-
     else:
-        return "Error: Please provide either RA and Dec or Object Name or TIC ID."
+        raise ValueError("Error: Please provide either RA and Dec or Object Name or TIC ID.")
+    
+    return sectors, cutouts
+
+def process_sectors(sectors, cutouts):
 
     # create a list of results and store sector number, cycle, and camera for each sector
     results = []
     for sector, cutout in zip(sectors, cutouts):
         # Retrieve the sector number from the sectors list
-        sector_number = sector['sector']
-        cycle = (sector_number - 1) // 13 + 1  # Calculate the cycle number
+        current_sector_number = sector['sector']
+        cycle = (current_sector_number - 1) // 13 + 1  # Calculate the cycle number
         # Retrieve the camera information from the sectors list
         camera = sector['camera']
         # Retrieve the observation date from the header of the first TPF in the cutout list
         obs_date = cutout[0].header['DATE-OBS']
         # Combine the information into a list
-        result = [sector_number, cycle, camera, obs_date]
+        result = [current_sector_number, cycle, camera, obs_date]
         results.append(result)  # Add the list to the results
+    return results, cycle, obs_date
+
+def sectors(search_input, radius, sector_number):
+    try:
+        sectors = Tesscut.get_sectors(coordinates=search_input, radius=radius)
+    except ResolverError:
+        # Display an error message to the user and prompt them to try again
+        return "Could not resolve input to a sky position. Please try again with a different input."
+    
+    coord, ra, dec, object_name, tic_id = resolve_input(search_input)
+
+    if not coord and not object_name and not tic_id:
+        return "Error: Please enter a correct input (RA/Dec, object name, or TIC ID)."
+
+    queried_sectors, cutouts = query_sectors(coord, object_name, tic_id, radius)
+
+    results, cycle, obs_date = process_sectors(queried_sectors, cutouts)
+
     return results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date
+
+
+def generate_sector_graphs(object_name, results):
+    sector_graphs = []
+    for result in results:
+        sector_graphs.append(sector_graph(object_name, [result], result[1]))
+    return sector_graphs
 
 
 def get_metadata(coord, object_name, tic_id):
