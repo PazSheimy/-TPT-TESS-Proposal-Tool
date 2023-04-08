@@ -19,6 +19,8 @@ import csv
 from io import StringIO
 import requests.exceptions
 from requests.exceptions import ConnectionError
+from astropy.coordinates.name_resolve import NameResolveError
+
 
 
 
@@ -195,8 +197,16 @@ def process_data(search_input, radius, sector_number):
         "table_visibility": table_visibility,
     }
 
+
 def resolve_input(search_input):
-    coord, ra, dec, object_name, tic_id = None, None, None, None, None
+     # initialize variables with None
+    coord = None
+    ra = None
+    dec = None
+    object_name = None
+    tic_id = None
+    sector_number = None
+
     # try to convert the search_input into a SkyCoord object
     try:
         coord = SkyCoord(search_input, unit="deg")
@@ -235,12 +245,27 @@ def query_sectors(coord, object_name, tic_id, radius):
             coordinates=coord, radius=float(radius)*u.deg)
         cutouts = Tesscut.get_cutouts(coordinates=coord)
     elif object_name:
-        sectors = Tesscut.get_sectors(
-            objectname=object_name, radius=float(radius)*u.deg)
-        cutouts = Tesscut.get_cutouts(coordinates=object_name)
+        try:
+            sectors = Tesscut.get_sectors(
+                objectname=object_name, radius=float(radius)*u.deg)
+            cutouts = Tesscut.get_cutouts(coordinates=object_name)
+        except NameResolveError:
+            raise ValueError("Error: Invalid object name.")
     elif tic_id:
+        # Check and add 'TIC' prefix if needed
+        tic_id = str(tic_id).strip()
+        if not tic_id.startswith("TIC"):
+            tic_id = "TIC " + tic_id
+
+        # Get the coordinates of the TIC ID
+        catalog_data = Catalogs.query_object(tic_id, catalog="TIC")
+        ra = catalog_data[0]['ra']
+        dec = catalog_data[0]['dec']
+        coord = SkyCoord(ra, dec, unit="deg")
+
+        # Use the coordinates to query sectors and cutouts
         sectors = Tesscut.get_sectors(
-            objectname=tic_id, radius=float(radius)*u.deg)
+            coordinates=tic_id, radius=float(radius)*u.deg)
         cutouts = Tesscut.get_cutouts(coordinates=tic_id)
     else:
         raise ValueError("Error: Please provide either RA and Dec or Object Name or TIC ID.")
@@ -265,11 +290,6 @@ def process_sectors(sectors, cutouts):
     return results, cycle, obs_date
 
 def sectors(search_input, radius, sector_number):
-    try:
-        sectors = Tesscut.get_sectors(coordinates=search_input, radius=radius)
-    except ResolverError:
-        # Display an error message to the user and prompt them to try again
-        return "Could not resolve input to a sky position. Please try again with a different input."
     
     coord, ra, dec, object_name, tic_id = resolve_input(search_input)
 
