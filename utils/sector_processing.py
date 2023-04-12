@@ -120,43 +120,41 @@ def sectors(search_input, radius, sector_number):
 
 
 def resolve_input(search_input):
-     # initialize variables with None
+    # Initialize variables with None
     coord = None
     ra = None
     dec = None
     object_name = None
     tic_id = None
-    sector_number = None
 
-    # try to convert the search_input into a SkyCoord object
-    try:
-        coord = SkyCoord(search_input, unit="deg")
-        ra = coord.ra.degree
-        dec = coord.dec.degree
-    except:
-        # if the conversion fails, check if the search_input contains a space
-        if " " in search_input:
-            try:
-                # if the search_input contains a space, split it into ra and dec
-                ra, dec = search_input.split(" ")
-                coord = SkyCoord(f"{ra} {dec}", unit="deg")
-            except:
-                # if this conversion also fails, coord will still be None
-                pass
-        # if coord is still None, check if the search_input is a digit
-        if not coord:
-            if search_input.isdigit():
-                # if the search_input is a digit, store it in tic_id
-                tic_id = search_input
-                object_name = "TIC " + tic_id
-            else:
-                # if the search_input is not a digit, store it in object_name
+    # Check if the search_input is a digit
+    if search_input.isdigit():
+        # If the search_input is a digit, store it in tic_id
+        tic_id = search_input
+        object_name = "TIC " + tic_id
+    else:
+        # Try to convert the search_input into a SkyCoord object
+        try:
+            coord = SkyCoord(search_input, unit="deg")
+            ra = coord.ra.degree
+            dec = coord.dec.degree
+        except:
+            # If the conversion fails, check if the search_input contains a space
+            if " " in search_input:
+                try:
+                    # If the search_input contains a space, split it into ra and dec
+                    ra, dec = search_input.split(" ")
+                    coord = SkyCoord(f"{ra} {dec}", unit="deg")
+                except:
+                    # If this conversion also fails, coord will still be None
+                    pass
+
+            # If coord is still None, store the search_input in object_name
+            if not coord:
                 object_name = search_input
-        else:
-            # if the input is not ra/dec, object name or tic id, return an error message
-            return "Error: Please enter a correct input (RA/Dec, object name, or TIC ID)."
 
     return coord, ra, dec, object_name, tic_id
+
 
 
 def query_sectors(coord, object_name, tic_id, radius):
