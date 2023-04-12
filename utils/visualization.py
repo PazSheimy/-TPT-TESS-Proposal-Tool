@@ -7,6 +7,7 @@ from bokeh.models import ColumnDataSource
 from astropy import units as u
 
 
+
 def index():
     # sets <table> container visibility to 'hidden' upon page load
     table_visibility = 'hidden'

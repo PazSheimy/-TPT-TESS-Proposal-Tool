@@ -130,8 +130,16 @@ def resolve_input(search_input):
     # Check if the search_input is a digit
     if search_input.isdigit():
         # If the search_input is a digit, store it in tic_id
-        tic_id = search_input
-        object_name = "TIC " + tic_id
+        tic_id = int(search_input)
+        object_name = "TIC " + str(tic_id)
+        # Query the TIC catalog for the object's coordinates
+        tic_object = Catalogs.query_criteria(catalog="TIC", ID=tic_id)
+        if len(tic_object) > 0:
+            ra = float(tic_object['ra'][0])
+            dec = float(tic_object['dec'][0])
+            coord = SkyCoord(f"{ra} {dec}", unit="deg")
+        else:
+            coord = None
     else:
         # Try to convert the search_input into a SkyCoord object
         try:
@@ -201,3 +209,10 @@ def process_sectors(sectors, cutouts):
         result = [current_sector_number, cycle, camera, obs_date]
         results.append(result)  # Add the list to the results
     return results, cycle, obs_date
+
+def get_ra_dec_from_tic_id(tic_id):
+    coord, _, _, _, _ = resolve_input(tic_id)
+    if coord is None:
+        raise ValueError("Error: Invalid TIC ID.")
+    return coord.ra.degree, coord.dec.degree
+

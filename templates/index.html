@@ -24,7 +24,6 @@
         <div class="sky-map">
             <form id="form-sky" method="post">
                 <h2>Search Sky Map</h2>
-                {# <label for="target">Target:</label>#}
                 <input type="text" id="target" name="target" value="{{ target }}" placeholder="Target">
                 <button type="submit">Search</button>
             </form>
@@ -35,10 +34,35 @@
                 $('form').submit(function (event) {
                     event.preventDefault();
                     target = $('#target').val();
-                    aladin.gotoObject(target);
+                    console.log('Form submitted, target:', target);
+
+                    // Check if the input is a TIC ID (assuming it starts with 'TIC')
+                    if (target.toUpperCase().startsWith('TIC') || !isNaN(target)) {
+                        if (!target.toUpperCase().startsWith('TIC')) {
+                            target = 'TIC ' + target;
+                        }
+                        console.log('Submitting TIC ID request:', target);
+                        $.ajax({
+                            url: '/lookup_tic',
+                            method: 'POST',
+                            data: { tic_id: target },
+                            success: function (data) {
+                                var ra = data.ra;
+                                var dec = data.dec;
+                                aladin.gotoRaDec(ra, dec);
+                            },
+                            error: function () {
+                                alert('Error: TIC ID not found');
+                            }
+                        });
+                    } else {
+                        aladin.gotoObject(target);
+                    }
                 });
+
             </script>
         </div>
+
         <div class="query-container">
             <div class="search-input">
                 <div class="search-input-1">
@@ -125,8 +149,8 @@
                     <thead>
                         <tr>
                             <th>Sector</th>
-                            <th>Cycle</th>
                             <th>Camera</th>
+                            <th>Cycle</th>
                             <th>Observation Date</th>
                         </tr>
                     </thead>
@@ -149,7 +173,6 @@
             </div>
             <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
         </div>
-        
         <div class="plot1">
             {{ diagram1|safe }}
         </div>
