@@ -1,0 +1,455 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+}
+
+
+/* index page & target visualization page main containers */
+.main-container-index,
+.main-container-target-visualization {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: .25fr repeat(2, 1fr);
+    grid-column-gap: 0;
+    grid-row-gap: 0;
+    background-image: linear-gradient(to bottom, #09203f, #1b3454, #2d4a69, #3f607f, #537895);
+    height: 100vh;
+}
+
+/* target list page main container */
+.main-container-target-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, .25fr) 1fr .25fr;
+    grid-column-gap: 0;
+    grid-row-gap: 0;
+    background-image: linear-gradient(to bottom, #09203f, #1b3454, #2d4a69, #3f607f, #537895);
+    height: 100vh;
+}
+
+h2,
+caption {
+    font-size: 1.2rem;
+    color: white;
+}
+
+
+/************************ Header / Nav ************************/
+nav {
+    grid-area: 1 / 1 / 2 / 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /*margin-bottom: 50px;*/
+}
+
+.nav-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: black;
+}
+
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: #1f3e80;
+}
+
+ul {
+    display: flex;
+    list-style-type: none;
+}
+
+.nav-menu ul li {
+    margin: 0 10px;
+}
+
+.nav-menu a {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-menu a:hover {
+    color: #ec1c24;
+}
+
+#logo,
+#satellite {
+    width: 10%;
+    height: auto;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-right: 20px;
+    color: white;
+    text-align: center;
+}
+
+#error {
+    margin-top: 10px;
+    width: 100%;
+    font-size: 1.4rem;
+    font-weight: bold;
+    background-color: black;
+    animation: animate 1.5s linear 3s;
+}
+
+@keyframes animate {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/************************ Index - divs ************************/
+.secondary-container-index {
+    grid-area: 2 / 1 / 5 / 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ccd1d1;
+    background-image: url("/static/bg_space.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.secondary-container-index a {
+    text-decoration: none;
+    color: #ccd1d1;
+}
+
+.secondary-container-index h3 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.secondary-container-index p {
+    margin: 20px 10px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+
+
+.tool-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.tool-visualization,
+.tool-list{
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.tool-visualization:hover,
+.tool-list:hover {
+    background: rgba(236, 28, 36, 0.25);
+    cursor: pointer;
+}
+
+
+
+.tool-visualization {
+    margin-right: 30px;
+}
+
+.tool-list {
+    margin-left: 30px;
+}
+
+
+/************************ Target Visualization - Sky Map ************************/
+.sky-map {
+    grid-area: 2 / 1 / 4 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.sky-map h2 {
+    margin-bottom: 10px;
+}
+
+.sky-map-left-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sky-map-right-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    margin-left: 10px;
+}
+
+#aladin-lite-div {
+    height: 500px;
+    width: 500px;
+}
+
+#form-search-target {
+    margin-bottom: 20px;
+}
+
+
+/************************ Target Visualization - Query Container ************************/
+.query-container {
+    grid-area: 2 / 3 / 4 / 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.search-input-1 {
+    margin-bottom: 15px;
+}
+
+input {
+    outline: none;
+}
+
+.search-method {
+    display: flex;
+    align-items: flex-start;
+
+}
+
+.search-method div {
+    margin: 0 12px;
+}
+
+#form-csv-upload-skymap {
+    margin-bottom: 30px;
+}
+
+.search-csv {
+    margin-top: 30px;
+}
+
+.search-csv-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.search-csv p {
+    margin-bottom: 10px;
+}
+
+.query-input-radius {
+    width: 150px;
+}
+
+/************************ Target Visualization - Table ************************/
+.results-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.results-container a {
+    color: #ccd1d1;
+}
+.results-container a:hover {
+    color: #ec1c24;
+}
+
+.table-container {
+    max-height: 400px;
+    overflow-y: scroll;
+    margin: 5px;
+}
+
+table {
+    table-layout: auto;
+    width: 75%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    background-color: rgba(255,255,255,.2);
+    border: 1px solid black;
+	padding: 8px;
+}
+
+th,
+thead {
+    background-color: #1f3e80;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+tbody td {
+    text-align: center;
+
+}
+
+tr:nth-child(even) {
+  background-color: #ccd1d1 ;
+}
+
+
+/************************ Target List - ************************/
+.csv-upload-list-graphs {
+    display: flex;
+}
+
+#form-upload-list-graphs {
+    grid-area: 2 / 1 / 3 / 5;
+}
+
+.plot1 {
+    grid-area: 3 / 1 / 4 / 2;
+    align-self: center;
+    height: 100%;
+    margin: 2px;
+    border-style: dashed;
+}
+
+.plot2 {
+    grid-area: 3 / 2 / 4 / 3;
+    align-self: center;
+    height: 100%;
+    margin: 2px;
+    border-style: dashed;
+}
+
+.plot3 {
+    grid-area: 3 / 3 / 4 / 4;
+    align-self: center;
+    height: 100%;
+    margin: 2px;
+    border-style: dashed;
+}
+
+.plot4 {
+    grid-area: 3 / 4 / 4 / 5;
+    align-self: center;
+    height: 100%;
+    margin: 2px;
+    border-style: dashed;
+}
+
+.download-results-graph {
+     grid-area: 4 / 1 / 5 / 5;
+}
+
+
+/************************ Media Queries ************************/
+@media only screen and (max-width: 1300px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2,
+    caption {
+        font-size: 1rem;
+    }
+
+    #aladin-lite-div {
+        height: 300px;
+        width: 300px;
+    }
+    /******************* Nav bar *******************/
+    .nav-menu a {
+        font-size: 1.1rem;
+    }
+
+    /******************* Index page *******************/
+    .secondary-container-index h3 {
+        font-size: 1.5rem;
+    }
+
+    .secondary-container-index p {
+        padding: 0 10px;
+        font-size: 1.2rem;
+    }
+
+    /******************* Target Visualization page *******************/
+    .sky-map {
+        margin-top: 20px;
+    }
+
+    .search-input {
+        margin: 10px 0 0 0;
+    }
+
+    #form-csv-upload-skymap {
+    margin-bottom: 0;
+    }
+
+    .search-csv {
+        width: 90%;
+        margin: 0;
+    }
+
+    .search-csv-buttons {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .query-input-RA {
+        width: 200px;
+    }
+
+    .query-input-radius {
+        width: 100px;
+    }
+
+    .query-input-sector {
+        width: 145px;
+    }
+
+    .search-csv h2 {
+        text-align: center;
+    }
+
+    .results-container {
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+}

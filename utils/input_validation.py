@@ -3,6 +3,19 @@ import requests
 from utils.sector_processing import process_data
 
 
+### new pages #####
+def target_visualization_page():
+    # sets <table> container visibility to 'hidden' upon page load
+    table_visibility = 'hidden'
+
+    return render_template("target_visualization.html", table_visibility=table_visibility)
+
+def target_list_page():
+    return render_template("target_list.html")
+
+#### end new pages ####
+
+
 #function to validate inputs
 def validate_inputs(search_input, radius, sector_selection):
     if not search_input:
