@@ -9,4 +9,3 @@ def register_routes(app):
     app.route('/download', methods=['GET', 'POST'])(download)
     app.route("/target_visualization", methods=['GET', 'POST'])(target_visualization_page)
     app.route("/target_list", methods=['GET', 'POST'])(target_list_page)
-

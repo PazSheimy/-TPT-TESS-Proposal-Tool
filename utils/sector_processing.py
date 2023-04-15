@@ -249,5 +249,3 @@ def get_targets_from_uploaded_csv(uploaded_csv_file):
     
     targets = process_csv_for_sky_map(uploaded_csv_file)
     return targets
-
-
