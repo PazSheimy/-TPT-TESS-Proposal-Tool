@@ -1,79 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>TESS Proposal Tool</title>
-        <link rel="stylesheet" href="/static/style.css">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
-        <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-        <script src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
-    </head>
-    <body>
-        <div class="main-container-index">
-            <nav>
-                <div class="nav-header">
-                    <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
-                    <h1>TESS Proposal Tool</h1>
-                    <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
-                </div>
-                <div class="nav-menu">
-                    <ul>
-                        <li><a href="{{ url_for('index')}}">Home</a></li>
-                        <li><a href="{{ url_for('target_visualization_page')}}">Target Visualization Tool</a></li>
-                        <li><a href="{{ url_for('target_list_page')}}">Target List Crafting Tool</a></li>
-                    </ul>
-                </div>
-            </nav>
-            <div class="secondary-container-index">
-                <h1>Welcome!</h1>
-                <p>This web app was created in order to allow users to interact with and explore data from the TESS mission. You can conveniently find data regarding observations,
-                    such as which sector is being viewed and by which camera, as well as the observation date.
-                </p>
-                <p>To get started, simply select which tool you would like to use. From there, you can easily search by entering coordinates, an object name, or TIC ID.</p>
-                <div class="tool-container">
-                    <a class="tool-visualization" href="{{ url_for('target_visualization_page')}}">
-                        <h3>Target Visualization Tool</h3>
-                        <p>View astronomical images of a target via the Sky Map.</p>
-                    </a>
-                    <a class="tool-list" href="{{ url_for('target_list_page')}}">
-                        <h3>Target List Crafting Tool</h3>
-                        <p>View HR diagram, Magnitude and Distance histograms</p>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>TESS Proposal Tool</title>
-    <link rel="stylesheet" href="/static/style_tess.css">
+    <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
     <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
+    <script src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
 </head>
 
 <body>
-    <div class="main-container">
+    <div class="main-container-target-visualization">
         <nav>
-            <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
-            <h1>Welcome to the TESS Proposal Tool</h1>
-            <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
+            <div class="nav-header">
+                <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
+                <h1>TESS Proposal Tool</h1>
+                <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
+            </div>
+            <div class="nav-menu">
+                <ul>
+                    <li><a href="{{ url_for('index')}}">Home</a></li>
+                    <li><a href="{{ url_for('target_visualization_page')}}">Target Visualization Tool</a></li>
+                    <li><a href="{{ url_for('target_list_page')}}">Target List Crafting Tool</a></li>
+                </ul>
+            </div>
+            {% if error %}
+            <div ID="error" class="alert alert-danger">{{ error }}</div>
+            {% endif %}
         </nav>
         <div class="sky-map">
             <form id="form-sky" method="post" enctype="multipart/form-data">
@@ -250,6 +208,7 @@
                                 }
                             }, 500); // Adjust the delay as needed (in milliseconds)
                         }
+
                     }
 
                     // Check if a CSV file is uploaded
@@ -265,30 +224,16 @@
                 <div class="search-input-1">
                     <h2>Search by RA, Dec, Object Name, TIC ID</h2>
                     <form action="/sectors" method="post">
-                        <input id="search_input" type="text" name="search_input"
-                            placeholder="RA, Dec, Object Name, or TIC ID" size="30">
-                        <input class="input-radius" id="radius" type="text" name="radius"
-                            placeholder="Radius (degrees)">
-                        <input type="number" id="sector" name="sector" placeholder="Sector number (optional)" size="15">
+                        <input class="query-input-RA" id="search_input" type="text" name="search_input"
+                            placeholder="RA, Dec, Object Name, or ID">
+                        <input class="query-input-radius" id="radius" type="text" name="radius" placeholder="Radius">
+                        <input class="query-input-sector" type="number" id="sector" name="sector"
+                            placeholder="Sector (optional)">
                         <input type="submit" value="Search">
                     </form>
                 </div>
             </div>
-            <div class="search-method">
-                <div>
-                    
-                    <input type="radio" id="method-1" name="query" value="#">
-                    <label for="method-1">e.g., Cyg X-1 or
-                        101.295, -16.699 or
-                        6 45 10.8, -16 41 58, in J2000
-                        TIC ID such as 268644785</label>
-                </div>
-                <div>
-                    <input type="radio" id="method-2" name="query" value="#">
-                    <label for="method-2">e.g, Sector 2</label>
-                </div>
-            </div>
-            <form action="/csv_upload" method="post" enctype="multipart/form-data">
+            <form id="form-csv-upload-skymap" action="/csv_upload" method="post" enctype="multipart/form-data">
                 <div class="search-csv">
                     <h2>Alternatively, you can search by uploading a CSV file containing coordinates.</h2>
                     <div class="search-csv-buttons">
@@ -296,93 +241,76 @@
                             <input type="file" name="csv_file">
                         </div>
                         <div class="search-csv-buttons-right">
-                            <input class="input-radius" id="radius" type="text" name="radius"
-                                placeholder="Radius (degrees)">
+                            <input class="query-input-radius" id="radius" type="text" name="radius"
+                                placeholder="Radius">
                             <input type="submit" value="Submit">
                         </div>
                     </div>
                 </div>
             </form>
-        </div>
-        {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-        {% endif %}
-
-        <div class="results-container" style="visibility: {{ table_visibility }}">
-
-            <h2>Query Results</h2>
-            <div class="table-container">
-                <table>
-                    {% if results %}
-                    {% if csv_file %}
-                    <thead>
-                        <tr>
-                            <th>RA</th>
-                            <th>Dec</th>
-                            <th>Sector</th>
-                            <th>Camera</th>
-                            <th>Cycle</th>
-                            <th>Observation Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="query-results-tbody">
-                        {% for i, result in enumerate(results) %}
-                        <tr>
-                            {% if i == 0 or results[i-1][:2] != result[:2] %}
-                            <td>{{ result[0] }}</td>
-                            <td>{{ result[1] }}</td>
-                            {% else %}
-                            <td></td>
-                            <td></td>
-                            {% endif %}
-                            <td>{{ result[2] }}</td>
-                            <td>{{ result[3] }}</td>
-                            <td>{{ result[4] }}</td>
-                            <td>{{ result[5] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <thead>
-                        <tr>
-                            <th>Sector</th>
-                            <th>Camera</th>
-                            <th>Cycle</th>
-                            <th>Observation Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="query-results-tbody">
-                        {% for i, result in enumerate(results) %}
-                        <tr>
-                            {% if i == 0 or results[i-1][:2] != result[:2] %}
-                            <td>{{ result[0] }}</td>
-                            <td>{{ result[1] }}</td>
-                            {% else %}
-                            {% endif %}
-                            <td>{{ result[2] }}</td>
-                            <td>{{ result[3] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% endif %}
-                    {% endif %}
-                </table>
+            <div class="results-container" style="visibility: {{ table_visibility }}">
+                <h2>Query Results</h2>
+                <div class="table-container">
+                    <table>
+                        {% if results %}
+                        {% if csv_file %}
+                        <thead>
+                            <tr>
+                                <th>RA</th>
+                                <th>Dec</th>
+                                <th>Sector</th>
+                                <th>Camera</th>
+                                <th>Cycle</th>
+                                <th>Observation Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i, result in enumerate(results) %}
+                            <tr>
+                                {% if i == 0 or results[i-1][:2] != result[:2] %}
+                                <td>{{ result[0] }}</td>
+                                <td>{{ result[1] }}</td>
+                                {% else %}
+                                <td></td>
+                                <td></td>
+                                {% endif %}
+                                <td>{{ result[2] }}</td>
+                                <td>{{ result[3] }}</td>
+                                <td>{{ result[4] }}</td>
+                                <td>{{ result[5] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <thead>
+                            <tr>
+                                <th>Sector</th>
+                                <th>Camera</th>
+                                <th>Cycle</th>
+                                <th>Observation Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i, result in enumerate(results) %}
+                            <tr>
+                                {% if i == 0 or results[i-1][:2] != result[:2] %}
+                                <td>{{ result[0] }}</td>
+                                <td>{{ result[1] }}</td>
+                                {% else %}
+                                {% endif %}
+                                <td>{{ result[2] }}</td>
+                                <td>{{ result[3] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% endif %}
+                        {% endif %}
+                    </table>
+                </div>
+                <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
             </div>
-            <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
-        </div>
-        <div class="plot1">
-            {{ diagram1|safe }}
-        </div>
-        <div class="plot2">
-            {{ diagram2|safe }}
-        </div>
-        <div class="plot3">
-            {{ diagram4|safe }}
-        </div>
-        <div class="plot4">
-            {{ diagram3|safe }}
         </div>
     </div>
 </body>
 
-</html> -->
+</html>

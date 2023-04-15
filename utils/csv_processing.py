@@ -15,19 +15,19 @@ def csv_upload():
     # Check if a radius value was provided
     if not radius:
         # If not, return an error message to the index.html template
-        return render_template('index.html', error='Radius value is required')
+        return render_template('target_visualization.html', error='Radius value is required')
 
     # Attempt to convert the radius to a float value
     try:
         radius_float = float(radius)
     except ValueError:
         # If the conversion fails, return an error message to the index.html template
-        return render_template('index.html', error='Invalid radius value')
+        return render_template('target_visualization.html', error='Invalid radius value')
 
     # Check if a CSV file was provided
     if not csv_file:
         # If not, return an error message to the index.html template
-        return render_template('index.html', error='CSV file is required')
+        return render_template('target_visualization.html', error='CSV file is required')
 
     try:
         # Read the contents of the CSV file into a StringIO object and decode it as UTF-8
@@ -37,11 +37,11 @@ def csv_upload():
         results = process_csv(csv_contents, radius_float)
     except Exception as e:
         # If there is an error processing the CSV file, return an error message to the index.html template
-        return render_template('index.html', error=f'Error processing CSV file: {str(e)}')
+        return render_template('target_visualization.html', error=f'Error processing CSV file: {str(e)}')
 
     # Generate a URL for the download route and render the index.html template with the results and download URL
     download_url = url_for('download', results=results)
-    return render_template('index.html', results=results, download_url=download_url, enumerate=enumerate, csv_file=csv_file)
+    return render_template('target_visualization.html', results=results, download_url=download_url, enumerate=enumerate, csv_file=csv_file)
 
 
 

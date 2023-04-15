@@ -6,6 +6,7 @@ from .visualization import generate_magnitude_histogram, generate_sector_graphs,
 from flask import url_for
 from astropy.coordinates.name_resolve import NameResolveError
 from astropy import units as u
+from io import TextIOWrapper
 
 def process_csv(csv_file, radius):
     # Create an empty list to store the results
@@ -211,8 +212,42 @@ def process_sectors(sectors, cutouts):
     return results, cycle, obs_date
 
 def get_ra_dec_from_tic_id(tic_id):
-    coord, _, _, _, _ = resolve_input(tic_id)
+    coord, _, _, _, _ = resolve_input(str(tic_id))
     if coord is None:
         raise ValueError("Error: Invalid TIC ID.")
     return coord.ra.degree, coord.dec.degree
+
+def process_csv_for_sky_map(csv_file):
+    target_data = []
+
+    reader = csv.reader(csv_file, delimiter=',')
+
+    for row in reader:
+        if len(row) == 2:
+            ra, dec = row[:2]
+            target_data.append({'ra': float(ra), 'dec': float(dec), 'target_name': None})
+        elif len(row) == 1:
+            id_or_name = row[0]
+            if id_or_name.isdigit():
+                tic_id = int(id_or_name)
+                ra, dec = get_ra_dec_from_tic_id(tic_id)
+                target_data.append({'ra': ra, 'dec': dec, 'target_name': f"TIC {tic_id}"})
+            else:
+                try:
+                    coord = SkyCoord.from_name(id_or_name)
+                    target_data.append({'ra': coord.ra.degree, 'dec': coord.dec.degree, 'target_name': id_or_name})
+                except NameResolveError:
+                    raise ValueError("Error: Invalid object name.")
+        else:
+            raise ValueError("Error: Invalid input format.")
+
+    return target_data
+
+def get_targets_from_uploaded_csv(uploaded_csv_file):
+    # Wrap the uploaded file in a TextIOWrapper
+    uploaded_csv_file = TextIOWrapper(uploaded_csv_file, 'utf-8')
+    
+    targets = process_csv_for_sky_map(uploaded_csv_file)
+    return targets
+
 

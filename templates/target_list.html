@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>TESS - Target List Crafting Tool</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+        <script src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
+    </head>
+    <body>
+        <div class="main-container-target-list">
+             <nav>
+               <div class="nav-header">
+                    <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
+                    <h1>TESS Proposal Tool</h1>
+                    <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
+                </div>
+                <div class="nav-menu">
+                    <ul>
+                        <li><a href="{{ url_for('index')}}">Home</a></li>
+                        <li><a href="{{ url_for('target_visualization_page')}}">Target Visualization Tool</a></li>
+                        <li><a href="{{ url_for('target_list_page')}}">Target List Crafting Tool</a></li>
+                    </ul>
+                </div>
+                 {% if error %}
+                     <div ID="error" class="alert alert-danger">{{ error }}</div>
+                 {% endif %}
+            </nav>
+            <div>
+                <form id="form-upload-list-graphs" method="post">
+                    <h2>Upload a target list:</h2>
+                    <input type="text" id="target-list" name="target-list" value="" placeholder="Target List">
+                    <input type="text" id="target-list-radius" name="target-list-radius" value="" placeholder="Radius" size="15">
+                    <button type="button">Search</button>
+                </form>
+                <div class="csv-upload-list-graphs">
+                    <input type="file" name="csv_file">
+                    <input type="text" id="csv-list-radius" name="csv-list-radius" value="" placeholder="Radius" size="15">
+                    <button type="submit">Search</button>
+                </div>
+            </div>
+            <div class="plot1">
+                {{ diagram1|safe }}
+            </div>
+            <div class="plot2">
+                {{ diagram2|safe }}
+            </div>
+            <div class="plot3">
+                {{ diagram4|safe }}
+            </div>
+            <div class="plot4">
+                {{ diagram3|safe }}
+            </div>
+            <div class="download-results-graph">
+               <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
+            </div>
+        </div>
+    </body>
+</html>
