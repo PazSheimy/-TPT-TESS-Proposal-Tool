@@ -1,7 +1,7 @@
 from routes import register_routes
 from flask import Flask,  jsonify, request
 import requests
-from utils.sector_processing import get_ra_dec_from_tic_id
+from utils.sector_processing import get_ra_dec_from_tic_id, get_targets_from_uploaded_csv
 
 
 app = Flask(__name__)
@@ -31,6 +31,18 @@ def lookup_tic():
     except Exception as e:
         print(f"Error in lookup_tic: {e}")
         return jsonify({'error': str(e)}), 500
+    
+
+
+@app.route('/upload-csv', methods=['POST'])
+def upload_csv():
+    if 'csv_file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    uploaded_csv_file = request.files['csv_file']
+    targets = get_targets_from_uploaded_csv(uploaded_csv_file)
+    return jsonify(targets)
+
 
 
 if __name__ == "__main__":
