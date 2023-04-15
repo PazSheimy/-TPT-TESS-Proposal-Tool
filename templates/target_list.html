@@ -32,7 +32,7 @@
                  {% endif %}
             </nav>
             <div>
-                <form id="form-upload-list-graphs" method="post">
+                <form id="form-upload-list-graphs" method="post" action="{{ url_for('target_list_page') }}">
                     <h2>Upload a target list:</h2>
                     <input type="text" id="target-list" name="target-list" value="" placeholder="Target List">
                     <input type="text" id="target-list-radius" name="target-list-radius" value="" placeholder="Radius" size="15">

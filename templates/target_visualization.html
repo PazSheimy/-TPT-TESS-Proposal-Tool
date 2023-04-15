@@ -223,7 +223,7 @@
             <div class="search-input">
                 <div class="search-input-1">
                     <h2>Search by RA, Dec, Object Name, TIC ID</h2>
-                    <form action="/sectors" method="post">
+                    <form id="form-search" action="/sectors" method="post">
                         <input class="query-input-RA" id="search_input" type="text" name="search_input"
                             placeholder="RA, Dec, Object Name, or ID">
                         <input class="query-input-radius" id="radius" type="text" name="radius" placeholder="Radius">
@@ -248,7 +248,8 @@
                     </div>
                 </div>
             </form>
-            <div class="results-container" style="visibility: {{ table_visibility }}">
+            <div class="results-container" style="visibility: {% if results %}visible{% else %}hidden{% endif %}">
+            <!-- <div class="results-container" style="visibility: {{ table_visibility }}"> -->
                 <h2>Query Results</h2>
                 <div class="table-container">
                     <table>

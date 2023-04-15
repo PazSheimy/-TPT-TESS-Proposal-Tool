@@ -77,7 +77,6 @@ def process_data(search_input, radius, sector_number):
     else:
         filtered_results = all_results
 
-    sector_graphs = generate_sector_graphs(object_name, all_results)
 
     # Generate sector graphs for all the results
     sector_graphs = generate_sector_graphs(object_name, all_results)
