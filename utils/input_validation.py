@@ -4,16 +4,49 @@ from utils.sector_processing import process_data
 
 
 ### new pages #####
+from flask import request, render_template
+
 def target_visualization_page():
-    # sets <table> container visibility to 'hidden' upon page load
     table_visibility = 'hidden'
+
+    if request.method == 'POST':
+        target = request.form.get('target')
+        # Process the target and perform any necessary actions
+        # ...
+
+        # Set the table visibility to 'visible' if you have data to display
+        table_visibility = 'visible'
+
+        # Render the template with the processed data
+        return render_template("target_visualization.html", target=target, table_visibility=table_visibility)
 
     return render_template("target_visualization.html", table_visibility=table_visibility)
 
+
+# def target_visualization_page():
+#     # sets <table> container visibility to 'hidden' upon page load
+#     table_visibility = 'hidden'
+
+#     return render_template("target_visualization.html", table_visibility=table_visibility)
+
 def target_list_page():
+
+    if request.method == 'POST':
+        target = request.form.get('target')
+        # Process the target and perform any necessary actions
+        # ...
+
+        # Set the table visibility to 'visible' if you have data to display
+
+        # Render the template with the processed data
+        return render_template("target_list.html")
+
     return render_template("target_list.html")
 
+
 #### end new pages ####
+
+
 
 
 #function to validate inputs
