@@ -48,3 +48,341 @@
         </div>
     </body>
 </html>
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TESS Proposal Tool</title>
+    <link rel="stylesheet" href="/static/style_tess.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
+</head>
+
+<body>
+    <div class="main-container">
+        <nav>
+            <img id="logo" src="/static/nasa_logo.svg" alt="nasa logo">
+            <h1>Welcome to the TESS Proposal Tool</h1>
+            <img id="satellite" src="/static/satellite.png" alt="TESS satellite">
+        </nav>
+        <div class="sky-map">
+            <form id="form-sky" method="post" enctype="multipart/form-data">
+                <h2>Search Sky Map</h2>
+                <input type="text" id="target" name="target" value="{{ target }}" placeholder="Target">
+                <input type="file" id="csv-file" name="csv_file" accept=".csv">
+                <button type="submit">Search</button>
+            </form>
+            <div id="aladin-lite-div"></div>
+            <script type="text/javascript">
+                var aladinOverlay = A.graphicOverlay({ color: "#ee2345", lineWidth: 3 });
+                var aladinCatalog = A.catalog({ name: "Targets", onClick: "showPopup" });
+
+                function add_target_to_sky_map(aladin, aladinOverlay, ra, dec, target_name, color = "blue") {
+                    var coord = new Coo(ra, dec, "deg");
+
+                    if (!target_name) {
+                        target_name = "Unnamed Target";
+                    }
+
+                    // Use built-in marker with specified color
+                    var source = A.marker(coord, {
+                        popupTitle: target_name,
+                        popupDesc: "RA: " + ra.toFixed(6) + ", Dec: " + dec.toFixed(6),
+                        color: color,
+                    });
+                    aladinCatalog.addSources([source]);
+
+                    // Add a circle around the target
+                    aladinOverlay.add(A.circle(ra, dec, 0.04, { color: "red" }));
+                }
+                function handle_uploaded_csv(aladin, uploaded_csv_file) {
+                    // Make an AJAX request to your Flask route with the uploaded CSV file
+                    var formData = new FormData();
+                    formData.append('csv_file', uploaded_csv_file);
+
+                    $.ajax({
+                        url: '/upload-csv',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            console.log('Data received from server:', data);
+
+                            // Create a new catalog object and add it to Aladin Lite
+                            aladinCatalog = A.catalog({ name: "Targets", onClick: "showPopup" });
+                            aladin.addCatalog(aladinCatalog);
+
+                            var sumRa = 0;
+                            var sumDec = 0;
+                            var numTargets = data.length;
+
+                            function processTarget(target, ra, dec) {
+                                console.log('Adding target to sky map:', target);
+                                add_target_to_sky_map(aladin, aladinOverlay, ra, dec, target.target_name, "red");
+                                sumRa += parseFloat(ra);
+                                sumDec += parseFloat(dec);
+
+                                // Check if all targets have been processed
+                                if (aladinCatalog.getSources().length === numTargets) {
+                                    // Calculate the average RA and DEC, and move the sky map to that position
+                                    var avgRa = sumRa / numTargets;
+                                    var avgDec = sumDec / numTargets;
+                                    aladin.gotoRaDec(avgRa, avgDec);
+                                }
+                            }
+
+                            // Loop through the returned targets
+                            data.forEach(function (target) {
+                                if (target.ra && target.dec) {
+                                    // If target has RA and DEC, call processTarget immediately
+                                    processTarget(target, target.ra, target.dec);
+                                } else if (target.target_name) {
+                                    // If target has a target name, resolve it to RA and DEC using aladin.gotoObject
+                                    aladin.gotoObject(target.target_name, function (found) {
+                                        if (found) {
+                                            var ra = aladin.view.getRa();
+                                            var dec = aladin.view.getDec();
+                                            processTarget(target, ra, dec);
+                                        } else {
+                                            console.error('Error: Target name not found:', target.target_name);
+                                        }
+                                    });
+                                } else if (target.tic_id) {
+                                    // If target has a TIC ID, make an AJAX request to the /lookup_tic Flask route
+                                    $.ajax({
+                                        url: '/lookup_tic',
+                                        method: 'POST',
+                                        data: { tic_id: 'TIC ' + target.tic_id },
+                                        success: function (data) {
+                                            var ra = data.ra;
+                                            var dec = data.dec;
+                                            processTarget(target, ra, dec);
+                                        },
+                                        error: function () {
+                                            console.error('Error: TIC ID not found:', target.tic_id);
+                                        }
+                                    });
+                                }
+                            });
+                        },
+
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error('Error uploading CSV file:', textStatus, errorThrown);
+                        }
+                    });
+                }
+
+
+                // Then, initialize the Aladin Lite instance and set up the form submission event
+
+                var target = "{{ target }}";
+                var aladin = A.aladin('#aladin-lite-div', { target: target, fov: 0.5, survey: "P/DSS2/color", reticleColor: '#ffeb3b', reticleSize: 22 });
+                aladin.addCatalog(aladinCatalog);
+                aladin.addOverlay(aladinOverlay);
+                $('form').submit(function (event) {
+                    event.preventDefault();
+                    target = $('#target').val();
+                    console.log('Form submitted, target:', target);
+
+                    var formData = new FormData();
+                    formData.append('csv_file', $('#csv-file')[0].files[0]);
+
+                    if (target) {
+                        // Check if the input is in RA/Dec format
+                        var raDecPattern = /^(\s*-?\d+(\.\d*)?)\s*,\s*(-?\d+(\.\d*)?)\s*$/;
+                        var raDecMatch = target.match(raDecPattern);
+
+                        if (raDecMatch) {
+                            var ra = parseFloat(raDecMatch[1]);
+                            var dec = parseFloat(raDecMatch[2]);
+                            aladin.gotoRaDec(ra, dec);
+                            add_target_to_sky_map(aladin, aladinOverlay, ra, dec, target, "red");
+                        }
+                        // Check if the input is a TIC ID (assuming it starts with 'TIC') or a number
+                        else if (target.toUpperCase().startsWith('TIC') || !isNaN(target)) {
+                            if (!target.toUpperCase().startsWith('TIC')) {
+                                target = 'TIC ' + target;
+                            }
+                            console.log('Submitting TIC ID request:', target);
+                            $.ajax({
+                                url: '/lookup_tic',
+                                method: 'POST',
+                                data: { tic_id: target },
+                                success: function (data) {
+                                    var ra = data.ra;
+                                    var dec = data.dec;
+                                    aladin.gotoRaDec(ra, dec);
+                                    add_target_to_sky_map(aladin, aladinOverlay, ra, dec, target, "red");
+                                },
+                                error: function () {
+                                    alert('Error: TIC ID not found');
+                                }
+                            });
+                        } else {
+                            // Handle target name input
+                            console.log('Trying to resolve target name:', target);
+                            aladin.gotoObject(target);
+
+                            // Use setTimeout() to delay the execution of the code after the view has updated
+                            setTimeout(function () {
+                                var raDec = aladin.getRaDec();
+                                var ra = raDec[0];
+                                var dec = raDec[1];
+
+                                // Check if the target is within the view after the delay
+                                if (Math.abs(aladin.getFov()[0]) >= 0.0001) {
+                                    console.log('Target name found:', target);
+                                    add_target_to_sky_map(aladin, aladinOverlay, ra, dec, target, "red");
+                                } else {
+                                    console.error('Error: Target name not found:', target);
+                                    alert('Error: Target name not found');
+                                }
+                            }, 500); // Adjust the delay as needed (in milliseconds)
+                        }
+                    }
+
+                    // Check if a CSV file is uploaded
+                    if ($('#csv-file')[0].files[0]) {
+                        // Call handle_uploaded_csv() function to upload CSV file and add markers to the sky map
+                        handle_uploaded_csv(aladin, $('#csv-file')[0].files[0]);
+                    }
+                });
+            </script>
+        </div>
+        <div class="query-container">
+            <div class="search-input">
+                <div class="search-input-1">
+                    <h2>Search by RA, Dec, Object Name, TIC ID</h2>
+                    <form action="/sectors" method="post">
+                        <input id="search_input" type="text" name="search_input"
+                            placeholder="RA, Dec, Object Name, or TIC ID" size="30">
+                        <input class="input-radius" id="radius" type="text" name="radius"
+                            placeholder="Radius (degrees)">
+                        <input type="number" id="sector" name="sector" placeholder="Sector number (optional)" size="15">
+                        <input type="submit" value="Search">
+                    </form>
+                </div>
+            </div>
+            <div class="search-method">
+                <div>
+                    
+                    <input type="radio" id="method-1" name="query" value="#">
+                    <label for="method-1">e.g., Cyg X-1 or
+                        101.295, -16.699 or
+                        6 45 10.8, -16 41 58, in J2000
+                        TIC ID such as 268644785</label>
+                </div>
+                <div>
+                    <input type="radio" id="method-2" name="query" value="#">
+                    <label for="method-2">e.g, Sector 2</label>
+                </div>
+            </div>
+            <form action="/csv_upload" method="post" enctype="multipart/form-data">
+                <div class="search-csv">
+                    <h2>Alternatively, you can search by uploading a CSV file containing coordinates.</h2>
+                    <div class="search-csv-buttons">
+                        <div class="search-csv-buttons-left">
+                            <input type="file" name="csv_file">
+                        </div>
+                        <div class="search-csv-buttons-right">
+                            <input class="input-radius" id="radius" type="text" name="radius"
+                                placeholder="Radius (degrees)">
+                            <input type="submit" value="Submit">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <div class="results-container" style="visibility: {{ table_visibility }}">
+
+            <h2>Query Results</h2>
+            <div class="table-container">
+                <table>
+                    {% if results %}
+                    {% if csv_file %}
+                    <thead>
+                        <tr>
+                            <th>RA</th>
+                            <th>Dec</th>
+                            <th>Sector</th>
+                            <th>Camera</th>
+                            <th>Cycle</th>
+                            <th>Observation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="query-results-tbody">
+                        {% for i, result in enumerate(results) %}
+                        <tr>
+                            {% if i == 0 or results[i-1][:2] != result[:2] %}
+                            <td>{{ result[0] }}</td>
+                            <td>{{ result[1] }}</td>
+                            {% else %}
+                            <td></td>
+                            <td></td>
+                            {% endif %}
+                            <td>{{ result[2] }}</td>
+                            <td>{{ result[3] }}</td>
+                            <td>{{ result[4] }}</td>
+                            <td>{{ result[5] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <thead>
+                        <tr>
+                            <th>Sector</th>
+                            <th>Camera</th>
+                            <th>Cycle</th>
+                            <th>Observation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="query-results-tbody">
+                        {% for i, result in enumerate(results) %}
+                        <tr>
+                            {% if i == 0 or results[i-1][:2] != result[:2] %}
+                            <td>{{ result[0] }}</td>
+                            <td>{{ result[1] }}</td>
+                            {% else %}
+                            {% endif %}
+                            <td>{{ result[2] }}</td>
+                            <td>{{ result[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endif %}
+                    {% endif %}
+                </table>
+            </div>
+            <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
+        </div>
+        <div class="plot1">
+            {{ diagram1|safe }}
+        </div>
+        <div class="plot2">
+            {{ diagram2|safe }}
+        </div>
+        <div class="plot3">
+            {{ diagram4|safe }}
+        </div>
+        <div class="plot4">
+            {{ diagram3|safe }}
+        </div>
+    </div>
+</body>
+
+</html> -->
