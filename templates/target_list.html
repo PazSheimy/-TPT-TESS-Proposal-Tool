@@ -32,17 +32,13 @@
                  {% endif %}
             </nav>
             <div>
-                <form id="form-upload-list-graphs" method="post" action="{{ url_for('target_list_page') }}">
-                    <h2>Upload a target list:</h2>
-                    <input type="text" id="target-list" name="target-list" value="" placeholder="Target List">
-                    <input type="text" id="target-list-radius" name="target-list-radius" value="" placeholder="Radius" size="15">
-                    <button type="button">Search</button>
+                <form id="csv-upload-form" method="post" action="{{ url_for('target_list_page') }}" enctype="multipart/form-data">
+                    <div class="csv-upload-list-graphs">
+                        <input type="file" name="csv_file">
+                        <!-- <input type="text" id="csv-list-radius" name="csv-list-radius" value="" placeholder="Radius" size="15"> -->
+                        <button type="submit">Search</button>
+                    </div>
                 </form>
-                <div class="csv-upload-list-graphs">
-                    <input type="file" name="csv_file">
-                    <input type="text" id="csv-list-radius" name="csv-list-radius" value="" placeholder="Radius" size="15">
-                    <button type="submit">Search</button>
-                </div>
             </div>
             <div class="plot1">
                 {{ diagram1|safe }}
@@ -56,9 +52,19 @@
             <div class="plot4">
                 {{ diagram3|safe }}
             </div>
-            <div class="download-results-graph">
-               <p>Download results as <a href="{{ url_for('download', results=results) }}">CSV file</a></p>
-            </div>
         </div>
+        <script>
+            $(document).ready(function() {
+                $("#search-button").click(function() {
+                    var targetListRadius = $("#target-list-radius").val();
+                    $("<input>").attr({
+                        type: "hidden",
+                        name: "radius",
+                        value: targetListRadius,
+                    }).appendTo("#form-upload-list-graphs");
+                    $("#form-upload-list-graphs").submit();
+                });
+            });
+        </script>  
     </body>
 </html>
