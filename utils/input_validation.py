@@ -1,7 +1,9 @@
 from flask import render_template, request
 import requests
-from utils.sector_processing import process_data
-
+from utils.sector_processing import process_data, get_targets_from_uploaded_csv, process_csv, get_targets_from_uploaded_csv_diagrams
+from utils.metadata import get_metadata
+from utils.visualization import generate_magnitude_histogram,hr_diagram,distance_histogram, sector_graph
+from astropy.coordinates import SkyCoord
 
 def target_visualization_page():
     table_visibility = 'hidden'
@@ -18,17 +20,46 @@ def target_visualization_page():
 
 def target_list_page():
     if request.method == 'POST':
-        ra = request.form.get('target-list')
-        dec = request.form.get('target-list-dec')
-        radius = request.form.get('target-list-radius')
+        radius = 0.01
+        csv_file = request.files.get('csv_file')
+        results = get_targets_from_uploaded_csv_diagrams(csv_file, radius)
+
+        # Aggregate data for all cycles
+        all_cycles = [result[4] for result in results]
         
-        # Process the data and generate graphs
-        diagram1, diagram2, diagram3, diagram4 = process_data(ra, dec, radius)
+        # Generate the sector graph with all the results
+        sector_graph_html = sector_graph("All Targets", results, all_cycles)
 
-        return render_template('target_list.html', diagram1=diagram1, diagram2=diagram2, diagram3=diagram3, diagram4=diagram4)
-    
+            # Create a SkyCoord object using the right ascension (ra) and declination (dec)
+           # coord = SkyCoord(ra=ra, dec=dec, unit='deg')
+            # Get the luminosity, temperature, star_name, magnitudes, and distance for the target
+            #luminosity, temperature, star_name, magnitudes, distance = get_metadata(
+            #    coord, object_name = None, tic_id= None)
+
+            # Generate the sector graphs
+             #sector_graphs = generate_sector_graphs(
+              #      star_name, results)
+
+            # # Generate the HR Diagram
+            # hr_diagram_html = hr_diagram(
+            #     luminosity, temperature, star_name, sector_number)
+
+            # # Generate the magnitude histogram
+            # magnitude_histogram_html = generate_magnitude_histogram(
+            #     star_name, magnitudes, sector_number)
+
+            # # Generate the distance histogram
+            # distance_histogram_html = distance_histogram(
+            #     star_name, sector_number, distance)
+
+            # diagrams.append((sector_graphs, hr_diagram_html, magnitude_histogram_html, distance_histogram_html))
+
+            
+
+        return render_template('target_list.html', diagram1=sector_graph_html)
+
+
     return render_template('target_list.html')
-
 
 
 #function to validate inputs
