@@ -2,11 +2,12 @@ import csv
 from astroquery.mast import Tesscut, Catalogs, Observations
 from astropy.coordinates import SkyCoord
 from .metadata import get_metadata
-from .visualization import generate_magnitude_histogram, generate_sector_graphs, hr_diagram, distance_histogram, sector_graph
+from .visualization import generate_magnitude_histogram, hr_diagram, distance_histogram, sector_graph
 from flask import url_for
 from astropy.coordinates.name_resolve import NameResolveError
 from astropy import units as u
 from io import TextIOWrapper
+from io import StringIO
 
 def process_csv(csv_file, radius):
     # Create an empty list to store the results
@@ -17,6 +18,7 @@ def process_csv(csv_file, radius):
 
     # Iterate over each row in the csv_file
     for row in reader:
+        print(f"Processing row: {row}")  # Add this line to debug graph only need to be taken out after
         if len(row) == 2:
             # Get the right ascension and declination from the row
             ra, dec = row[:2]
@@ -68,24 +70,12 @@ def process_csv(csv_file, radius):
 def process_data(search_input, radius, sector_number):
     all_results, ra, dec, object_name, tic_id, coord, sector_number, cycle, obs_date = sectors(
         search_input, radius, sector_number)
-    luminosity, temperature, star_name, magnitudes, distance = get_metadata(
-        coord, object_name, tic_id)
 
     # Filter the results based on the entered sector number
     if sector_number is not None:
         filtered_results = [result for result in all_results if result[0] == int(sector_number)]
     else:
         filtered_results = all_results
-
-
-    # Generate sector graphs for all the results
-    sector_graphs = generate_sector_graphs(object_name, all_results)
-
-    html1 = hr_diagram(luminosity, temperature, star_name, sector_number)
-    html2 = generate_magnitude_histogram(star_name, magnitudes, sector_number)
-    html3 = distance_histogram(star_name, sector_number, distance)
-    html4 = sector_graph(object_name, all_results, cycle)
-    download_url = url_for('download')
 
     # sets <table> visibility to 'visible' once query results are received
     table_visibility = 'visible'
@@ -94,18 +84,12 @@ def process_data(search_input, radius, sector_number):
         "results": filtered_results,
         "star_name": object_name,
         "sector_num": sector_number,
-        "diagram1": html1,
-        "diagram2": html2,
-        "diagram3": html3,
-        "diagram4": html4,
-        "sector_graphs": sector_graphs,
-        "download_url": download_url,
         "enumerate": enumerate,
         "table_visibility": table_visibility,
     }
 
 
-def sectors(search_input, radius, sector_number):
+def sectors(search_input, radius, sector_number=None):
     
     coord, ra, dec, object_name, tic_id = resolve_input(search_input)
 
@@ -248,3 +232,11 @@ def get_targets_from_uploaded_csv(uploaded_csv_file):
     
     targets = process_csv_for_sky_map(uploaded_csv_file)
     return targets
+
+#handles csv uploads from target_list.html making sure the file is open in text mode
+def get_targets_from_uploaded_csv_diagrams(uploaded_csv_file, radius):
+    # Wrap the uploaded file in a TextIOWrapper
+    uploaded_csv_file = TextIOWrapper(uploaded_csv_file, 'utf-8')
+    
+    results = process_csv(uploaded_csv_file, radius)
+    return results
