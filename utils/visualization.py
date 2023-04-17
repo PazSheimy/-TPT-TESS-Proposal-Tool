@@ -3,7 +3,8 @@ from bokeh.resources import Resources
 from bokeh.embed import file_html
 from flask import render_template, request
 import numpy as np
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, BoxSelectTool, Button, CustomJS
+from bokeh.layouts import column
 from astropy import units as u
 
 
@@ -13,14 +14,6 @@ def index():
     table_visibility = 'hidden'
 
     return render_template("index.html", table_visibility=table_visibility)
-
-
-def generate_sector_graphs(object_name, results):
-    sector_graphs = []
-    for result in results:
-        sector_graphs.append(sector_graph(object_name, [result], result[1]))
-    return sector_graphs
-
 
 
 def hr_diagram(luminosity, temperature, star_name, sector_number):
@@ -113,35 +106,44 @@ def distance_histogram(star_name, sector_num, distance):
 def sector_graph(object_name, results, cycle):
     sectors = []
     cycles = []
+    cameras = []
+    observation_dates = []
 
     for array in results:
-        sector = array[0]
-        cycle = array[1]
+        sector = array[2]
+        observed_cycle = array[4]
+        camera = array[3]
+        observation_date = array[5]
         sectors.append(sector)
-        cycles.append(cycle)
+        cycles.append(observed_cycle)
+        cameras.append(camera)
+        observation_dates.append(observation_date)
 
-    # Create a ColumnDataSource object with the sector and cycle data
-    source = ColumnDataSource(data=dict(sectors=sectors, cycles=cycles))
+    source = ColumnDataSource(data=dict(sectors=sectors, cycles=cycles, cameras=cameras, observation_dates=observation_dates))
 
-    # Create a new plot with a title and axis labels
     p = figure(title='Observed Sectors',
-               x_axis_label='Sector', y_axis_label='Cycle')
+           x_axis_label='Sector', y_axis_label='Cycle')
 
-    # Add a scatter plot with the sector and cycle data
     p.vbar(x='sectors', top='cycles', source=source,
            width=0.9, line_color="#033649")
 
-    # Set the chart range for the x-axis and y-axis
     p.x_range.start = 0
     p.y_range.start = 0
 
-    # # how the component should size itself
-    p.sizing_mode = "scale_both"
 
-    # shows the histogram of distances with the x-axis showing the distance in parsecs and
-    # the y-axis showing the frequency of each distance.
+    # Add the BoxSelectTool to the plot
+    p.add_tools(BoxSelectTool())
+
+    # Create a button for downloading the selected data
+    download_button = Button(label="Download", button_type="success")
+    download_button.js_on_click(CustomJS(args=dict(source=source),
+                            code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\utils\\download.js").read()))
+
+
+    # Add the button to a layout and then add the layout to the plot
+    layout = column(p, download_button, sizing_mode="fixed", width=400, height=450)
+
     resources = Resources(mode='cdn')
-    html4 = file_html(p, resources=resources,
+    html4 = file_html(layout, resources=resources,
                       title=f"Sectors Observed for {object_name}")
     return html4
-
