@@ -3,7 +3,7 @@ from bokeh.resources import Resources
 from bokeh.embed import file_html
 from flask import render_template, request
 import numpy as np
-from bokeh.models import ColumnDataSource, BoxSelectTool, Button, CustomJS
+from bokeh.models import ColumnDataSource, BoxSelectTool, Button, CustomJS, LogAxis
 from bokeh.layouts import column
 from astropy import units as u
 
@@ -14,31 +14,46 @@ def index():
     table_visibility = 'hidden'
 
     return render_template("index.html", table_visibility=table_visibility)
+    
+
+def hr_diagram(luminosity, temperature, star_name):
+    print("Temperature:", temperature)
+    print("Luminosity:", luminosity)
 
 
-def hr_diagram(luminosity, temperature, star_name, sector_number):
-    # Create a figure with the title HR Diagram for [star_name] (Sector [sector_number])
-    p = figure(title=f"HR Diagram for {star_name} (Sector {sector_number})")
+
+    # Create a figure with the title HR Diagram for [star_name]
+    p = figure(title=f"HR Diagram for {star_name}",
+               x_axis_type="log", y_axis_type="log")
+
     # Add a scatter plot of temperature vs. luminosity to the figure
-    p.circle(temperature, luminosity.to(u.W))
+    p.circle(temperature, luminosity)
+
     # Label the x-axis as Temperature (K)
     p.xaxis.axis_label = "Temperature (K)"
-    # Label the y-axis as Lumin
+
+    # Label the y-axis as Luminosity (solLum)
     p.yaxis.axis_label = "Luminosity (solLum)"
 
-    # how the component should size itself
+    # Set the sizing mode of the component
     p.sizing_mode = "scale_both"
 
-    # Set mode of resources to cdn for faster loading
+    # Set the mode of resources to cdn for faster loading
     resources = Resources(mode='cdn')
-    # Create HTML file from figure with specified title
+
+    # Create HTML file from figure with the specified title
     html1 = file_html(p, resources=resources,
-                      title=f"HR Diagram for {star_name} (Sector {sector_number})")
+                      title=f"HR Diagram for {star_name}")
+
 
     return html1
+    
+def generate_magnitude_histogram(star_name, magnitudes):
 
-
-def generate_magnitude_histogram(star_name, magnitudes, sector_number):
+    if not magnitudes:  # Add this check to ensure the input array is not empty
+        return None
+    
+    
     min_value = np.min(magnitudes)
     max_value = np.max(magnitudes)
     hist, edges = np.histogram(magnitudes, bins=200)
@@ -66,12 +81,12 @@ def generate_magnitude_histogram(star_name, magnitudes, sector_number):
     # Generate the HTML for the magnitude histogram
     resources = Resources(mode='cdn')
     html2 = file_html(p, resources=resources,
-                      title=f"Magnitude Histogram for {star_name} (Sector {sector_number})")
+                      title=f"Magnitude Histogram for {star_name}")
 
     return html2
 
 
-def distance_histogram(star_name, sector_num, distance):
+def distance_histogram(star_name, distance):
     # Generate some sample data
     distances = distance
 
@@ -99,7 +114,7 @@ def distance_histogram(star_name, sector_num, distance):
     # the y-axis showing the frequency of each distance.
     resources = Resources(mode='cdn')
     html3 = file_html(p, resources=resources,
-                      title=f"Magnitude Histogram for {star_name} (Sector {sector_num})")
+                      title=f"Magnitude Histogram for {star_name}")
     return html3
 
 

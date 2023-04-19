@@ -5,6 +5,7 @@ from utils.metadata import get_metadata
 from utils.visualization import generate_magnitude_histogram,hr_diagram,distance_histogram, sector_graph
 from astropy.coordinates import SkyCoord
 
+
 def target_visualization_page():
     table_visibility = 'hidden'
 
@@ -17,50 +18,63 @@ def target_visualization_page():
 
     return render_template("target_visualization.html", table_visibility=table_visibility)
 
-
 def target_list_page():
     if request.method == 'POST':
-        radius = 0.01
+        radius = 0.001
         csv_file = request.files.get('csv_file')
+        print("im in target list function")
         results = get_targets_from_uploaded_csv_diagrams(csv_file, radius)
+        print("im back in target_list_page just before entering in the loop 6")
+        print(results)
 
         # Aggregate data for all cycles
         all_cycles = [result[4] for result in results]
+        print("i just entered to the loop in  target_list_page 7")
         
         # Generate the sector graph with all the results
+        print(" sector graph is going to be call now 8 ")
         sector_graph_html = sector_graph("All Targets", results, all_cycles)
+        print(" sector graph was call 9 ")
 
-            # Create a SkyCoord object using the right ascension (ra) and declination (dec)
-           # coord = SkyCoord(ra=ra, dec=dec, unit='deg')
-            # Get the luminosity, temperature, star_name, magnitudes, and distance for the target
-            #luminosity, temperature, star_name, magnitudes, distance = get_metadata(
-            #    coord, object_name = None, tic_id= None)
+        all_luminosities = []
+        all_temperatures = []
+        all_magnitudes = []
+        all_distances = []
 
-            # Generate the sector graphs
-             #sector_graphs = generate_sector_graphs(
-              #      star_name, results)
+        # Replace the following lines with the new function
+        coord_list = [SkyCoord(ra=result[0], dec=result[1], unit='deg') for result in results]
+        metadata_list = get_metadata(coords=coord_list)
 
-            # # Generate the HR Diagram
-            # hr_diagram_html = hr_diagram(
-            #     luminosity, temperature, star_name, sector_number)
+        for metadata in metadata_list:
+            print(" entering in the loop for the metadata 10")
+            luminosity, temperature, star_name, magnitudes, distance = metadata
+            all_luminosities.extend(luminosity)
+            all_temperatures.extend(temperature)
+            all_magnitudes.extend(magnitudes)
+            all_distances.extend(distance)
+            print(" at the end of the loop 12 ")
 
-            # # Generate the magnitude histogram
-            # magnitude_histogram_html = generate_magnitude_histogram(
-            #     star_name, magnitudes, sector_number)
+        print(" generating graph after getting metadata 13 ")
 
-            # # Generate the distance histogram
-            # distance_histogram_html = distance_histogram(
-            #     star_name, sector_number, distance)
+        # Generate the HR Diagram for all targets
+        hr_diagram_html = hr_diagram(all_luminosities, all_temperatures, "All Targets")
+        print(" generating hr graph 14 ")
 
-            # diagrams.append((sector_graphs, hr_diagram_html, magnitude_histogram_html, distance_histogram_html))
+        # Generate the magnitude histogram for all targets
+        magnitude_histogram_html = generate_magnitude_histogram("All Targets", all_magnitudes)
+        print(" generating magnitude graph 15 ")
+        
+        if magnitude_histogram_html is None:
+            magnitude_histogram_html = "No magnitude data available"
+            print(" generating magnitude graph 15 ")
 
-            
+        # Generate the distance histogram for all targets
+        distance_histogram_html = distance_histogram("All Targets", all_distances)
+        print(" generating distance graph 16 ")
 
-        return render_template('target_list.html', diagram1=sector_graph_html)
-
+        return render_template('target_list.html', diagram1=sector_graph_html, diagram2=hr_diagram_html, diagram3=magnitude_histogram_html, diagram4=distance_histogram_html)
 
     return render_template('target_list.html')
-
 
 #function to validate inputs
 def validate_inputs(search_input, radius, sector_selection):

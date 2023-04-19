@@ -1,5 +1,5 @@
 from routes import register_routes
-from flask import Flask,  jsonify, request
+from flask import Flask, jsonify, request
 import requests
 from utils.sector_processing import get_ra_dec_from_tic_id, get_targets_from_uploaded_csv
 

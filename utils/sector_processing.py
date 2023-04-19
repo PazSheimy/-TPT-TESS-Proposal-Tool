@@ -10,8 +10,10 @@ from io import TextIOWrapper
 from io import StringIO
 
 def process_csv(csv_file, radius):
+    print("im in process csv 3")
     # Create an empty list to store the results
     target_results = []
+
 
     # Use the built-in csv module to read the csv_file
     reader = csv.reader(csv_file, delimiter=',')
@@ -63,6 +65,7 @@ def process_csv(csv_file, radius):
             target_results.append(
                 [coord.ra.deg, coord.dec.deg, sector_number, camera, cycle,obs_date])
     # Return the target_results list
+    print("im in process_csv_diagrams at the end of the loop 4")
 
     print(target_results)
     return target_results
@@ -235,8 +238,10 @@ def get_targets_from_uploaded_csv(uploaded_csv_file):
 
 #handles csv uploads from target_list.html making sure the file is open in text mode
 def get_targets_from_uploaded_csv_diagrams(uploaded_csv_file, radius):
+    print("im in get_targets_from_uploaded_csv_diagrams 2")
     # Wrap the uploaded file in a TextIOWrapper
     uploaded_csv_file = TextIOWrapper(uploaded_csv_file, 'utf-8')
     
     results = process_csv(uploaded_csv_file, radius)
+    print("im back in get_targets_from_uploaded_csv_diagrams 5")
     return results
