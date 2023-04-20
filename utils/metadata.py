@@ -7,7 +7,7 @@ def get_metadata(coords=None, object_names=None, tic_ids=None):
 
     if coords:
         for coord in coords:
-            metadata = Catalogs.query_region(coord, radius=0.01 * u.arcmin, catalog="Tic")
+            metadata = Catalogs.query_region(coord, radius=1 * u.arcmin, catalog="Tic")
             star_name = f"{coord.ra.degree} {coord.dec.degree}"
             metadata_list.append((metadata, star_name))
     elif object_names:
