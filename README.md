@@ -22,7 +22,7 @@ pip (Python Package Installer)
 git clone https://github.com/your_username/satellite-target-visualization.git
 cd satellite-target-visualization
 
-2- Create a virtual environment and activate it:
+2- Create a virtual environment and activate it: (optional)
 python -m venv venv
 source venv/bin/activate  # For Linux/Mac
 venv\Scripts\activate  # For Windows
@@ -43,6 +43,13 @@ python main.py
 3- Navigate to the "Target List" page to view and analyze the targets using HR diagrams, Distance Histogram, Magnitud Histogram, etc.
 
 3- You can download the graph data for further analysis.
+
+4- csv files example:
+Tic id: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv
+
+Target Name: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv
+
+Ra, Dec: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/fiveradecdata.csv
 
 # Contributing
 Feel free to submit issues, feature requests, and pull requests.
