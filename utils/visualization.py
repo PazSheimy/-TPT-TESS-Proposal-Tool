@@ -138,7 +138,8 @@ def generate_magnitude_histogram(star_name, magnitudes):
 
     # Create a Bokeh figure object and add the histogram to it
     p = figure(title=f"{star_name} Magnitude Histogram",
-               x_axis_label='Magnitude', y_axis_label='Frequency')
+               x_axis_label='Magnitude', y_axis_label='Frequency',
+               x_range=(0, max(edges)), y_range=(0, max(hist)))
     p.quad(top='top', bottom='bottom', left='left',
            right='right', source=source, line_color='black')
     
@@ -147,7 +148,7 @@ def generate_magnitude_histogram(star_name, magnitudes):
     p.xaxis.axis_label = "TESS Magnitude"
 
     # Set the y-axis label
-    p.yaxis.axis_label = "Density"
+    p.yaxis.axis_label = "Frequency"
 
     # Set the sizing mode of the component to scale with window size
     p.sizing_mode = "scale_both"
@@ -172,7 +173,6 @@ def distance_histogram(star_name, distance):
         An HTML string containing the generated distance histogram.
     """
 
-
     # Create a histogram of the distances using numpy
     hist, edges = np.histogram(distance, bins=50)
 
@@ -186,7 +186,9 @@ def distance_histogram(star_name, distance):
 
     # Create a Bokeh figure object and add the histogram to it
     p = figure(title="Distance Histogram",
-               x_axis_label='Distance (parsecs)', y_axis_label='Frequency')
+               x_axis_label='Distance (parsecs)', y_axis_label='Frequency',
+               x_range=(min(edges), max(edges)), y_range=(0, max(hist)),
+               x_axis_type="log")  # Use a log scale for the x-axis
     p.quad(top='top', bottom='bottom', left='left',
            right='right', source=source, line_color="#033649")
 
@@ -196,8 +198,9 @@ def distance_histogram(star_name, distance):
     # Generate the HTML for the distance histogram
     resources = Resources(mode='cdn')
     html3 = file_html(p, resources=resources,
-                      title=f"Magnitude Histogram for {star_name}")
+                      title=f"Distance Histogram for {star_name}")
     return html3
+
 
 
 def sector_graph(object_name, results, cycle):
