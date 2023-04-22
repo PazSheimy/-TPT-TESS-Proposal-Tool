@@ -22,6 +22,8 @@ pip (Python Package Installer)
 
 [Clone](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git)
 
+https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
+
 
 2- Create a virtual environment and activate it: (optional)
 
