@@ -45,19 +45,12 @@ python main.py
 3- You can download the graph data for further analysis.
 
 4- csv files example:
-<caption>Table 1: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv
-</caption>
-Tic id: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv
+Tic id: [Download CSV file](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv)
 
-Target Name: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv
-csv files to test/5targnamesneartoeachother.csv
-# 
-[Download CSV file](csv files to test/5targnamesneartoeachother.csv)
-#
-[Download CSV file](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv)
+Target Name: [Download CSV file](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv)
 
+Ra, Dec: [Download CSV file](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/fiveradecdata.csv)
 
-Ra, Dec: https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/fiveradecdata.csv
 
 # Contributing
 Feel free to submit issues, feature requests, and pull requests.
