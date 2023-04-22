@@ -19,8 +19,7 @@ pip (Python Package Installer)
 
 # Installation
 1- Clone the repository to your local machine:
-git clone https://github.com/your_username/satellite-target-visualization.git
-cd satellite-target-visualization
+https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
 
 2- Create a virtual environment and activate it: (optional)
 python -m venv venv
