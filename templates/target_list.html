@@ -1,3 +1,35 @@
+<!-- 
+TESS - Target List Crafting Tool - HTML Documentation
+
+Overview:
+This HTML file serves as the main page structure for the Target List Crafting Tool, which is a part of the TESS (Transiting Exoplanet Survey Satellite) Proposal Tool. The primary functionality of this page is to display four plots based on the uploaded CSV file of target data. This documentation outlines the structure and purpose of the different sections of the HTML file.
+
+1. DOCTYPE and HTML declaration:
+   - `<!DOCTYPE html>` specifies the document type declaration for HTML5.
+   - `<html lang="en">` sets the language attribute to English.
+
+2. Head section:
+   - Contains metadata, stylesheets, and scripts necessary for the webpage.
+   - Metadata includes character encoding, viewport, and compatibility settings.
+   - Stylesheets include external libraries such as Leaflet and Aladin Lite, along with a custom CSS file.
+   - Scripts import external JavaScript libraries, including jQuery, Leaflet, and Aladin Lite.
+
+3. Body section:
+   - Main content of the webpage is divided into two main sections:
+     1. Navigation: Contains a header with the NASA logo, page title, and TESS satellite image, and a menu with links to the home page, target visualization tool, and target list crafting tool.
+     2. Main container:
+        - CSV file upload form: Allows the user to upload a CSV file of target data and submit it for processing.
+        - Four plot containers: Display the generated plots based on the uploaded CSV file.
+
+4. Script section:
+   - Contains a jQuery script that appends a hidden input element with the radius value to the form when the search button is clicked and then submits the form.
+
+Technologies used:
+- Server-side rendering: Flask (Python)
+- Client-side interactions: JavaScript libraries (jQuery, Leaflet, Aladin Lite)
+- Styling: Custom CSS file
+
+-->
 <!DOCTYPE html>
 <html lang="en">
     <head>

@@ -1,5 +1,7 @@
+/* Imported fonts */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 
+/* General styles */
 * {
     margin: 0;
     box-sizing: border-box;
@@ -8,7 +10,7 @@
 }
 
 
-/* index page & target visualization page main containers */
+/* Main containers for index page and target visualization page */
 .main-container-index,
 .main-container-target-visualization {
     display: grid;
@@ -20,17 +22,18 @@
     height: 100vh;
 }
 
-/* target list page main container */
+/* Main container for target list page */
 .main-container-target-list {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, .25fr) 1fr .25fr;
+    grid-template-rows: repeat(2, .25fr) .75fr .25fr;
     grid-column-gap: 0;
     grid-row-gap: 0;
     background-image: linear-gradient(to bottom, #09203f, #1b3454, #2d4a69, #3f607f, #537895);
     height: 100vh;
 }
 
+/* Heading and caption styles */
 h2,
 caption {
     font-size: 1.2rem;
@@ -38,7 +41,7 @@ caption {
 }
 
 
-/************************ Header / Nav ************************/
+/************************ Header and Navigation styles ************************/
 nav {
     grid-area: 1 / 1 / 2 / 5;
     display: flex;
@@ -119,7 +122,7 @@ h1 {
     }
 }
 
-/************************ Index - divs ************************/
+/************************ Index page content styles (Index - divs) ************************/
 .secondary-container-index {
     grid-area: 2 / 1 / 5 / 5;
     display: flex;
@@ -194,14 +197,21 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    padding-top: 40px;
 }
 .sky-map h2 {
-    margin-bottom: 10px;
+    margin-bottom: 25px;
+    font-size: 1.7rem;
+}
+
+.sky-map h3 {
+    margin-bottom: 5px;
+    color: #ccd1d1;
+    font-size: 1.1rem;
 }
 
 .sky-map-left-group {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -209,8 +219,6 @@ h1 {
 .sky-map-right-group {
     display: flex;
     flex-direction: column;
-    margin-top: 30px;
-    margin-left: 10px;
 }
 
 #aladin-lite-div {
@@ -218,8 +226,37 @@ h1 {
     width: 500px;
 }
 
-#form-search-target {
-    margin-bottom: 20px;
+#form-sky {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
+}
+
+#form-sky hr {
+    margin-top: 10px;
+    width: 100%;
+    color: #ccd1d1;
+}
+
+#form-sky p {
+    margin: 20px 0;
+    font-size: 1.3rem;
+    color: white;
+}
+
+#form-sky button {
+    margin-top: 20px;
+    width: 50%;
+}
+
+#csv-file {
+    margin-top: 10px;
+}
+
+#target {
+    width: 200px;
 }
 
 
@@ -229,62 +266,72 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 40px;
 }
 
-.search-input {
+.query-container p {
+    margin: 20px 0;
+    font-size: 1.3rem;
+    color: white;
+}
+
+.query-single-target {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 10px;
 }
 
-.search-input-1 {
-    margin-bottom: 15px;
+.query-single-target h2 {
+    margin-bottom: 25px;
+    font-size: 1.7rem;
+    text-align: center;
+}
+
+.query-single-target h3 {
+    margin-bottom: 5px;
+    color: #ccd1d1;
+    font-size: 1.1rem;
+    text-align: center;
 }
 
 input {
     outline: none;
 }
 
-.search-method {
-    display: flex;
-    align-items: flex-start;
-
-}
-
-.search-method div {
-    margin: 0 12px;
-}
-
-#form-csv-upload-skymap {
+#form-csv-upload-target-data {
     margin-bottom: 30px;
 }
 
-.search-csv {
-    margin-top: 30px;
+.query-list h3 {
+    margin-bottom: 5px;
+    color: #ccd1d1;
+    font-size: 1.1rem;
+    text-align: center;
 }
 
-.search-csv-buttons {
+.query-list-input {
     display: flex;
     justify-content: space-around;
-    margin: 20px 0;
-}
-
-.search-csv p {
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .query-input-radius {
+    width: 75px;
+}
+
+.query-input-sector {
     width: 150px;
 }
 
+#query-list-search {
+        margin-left: 4px;
+    }
+
 /************************ Target Visualization - Table ************************/
 .results-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     margin-bottom: 5px;
+    text-align: center;
 }
 
 .results-container a {
@@ -295,14 +342,14 @@ input {
 }
 
 .table-container {
-    max-height: 400px;
+    max-height: 285px;
     overflow-y: scroll;
     margin: 5px;
 }
 
 table {
-    table-layout: auto;
-    width: 75%;
+    table-layout: fixed;
+    /*width: 75%;*/
     border-collapse: collapse;
 }
 
@@ -332,51 +379,64 @@ tr:nth-child(even) {
 }
 
 
-/************************ Target List - ************************/
-.csv-upload-list-graphs {
+/************************ Target List page ************************/
+.target-list-input-container {
+    grid-area: 2 / 1 / 3 / 5;
     display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-bottom: 30px;
 }
 
-#form-upload-list-graphs {
-    grid-area: 2 / 1 / 3 / 5;
+.target-list-input-container h2 {
+    margin-bottom: 25px;
+    font-size: 1.7rem;
+}
+
+.target-list-input-container h3 {
+    color: #ccd1d1;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
 }
 
 .plot1 {
     grid-area: 3 / 1 / 4 / 2;
     align-self: center;
     height: 100%;
-    margin: 2px;
-    border-style: dashed;
+    margin: 4px;
 }
 
 .plot2 {
     grid-area: 3 / 2 / 4 / 3;
     align-self: center;
     height: 100%;
-    margin: 2px;
-    border-style: dashed;
+    margin: 4px;
 }
 
 .plot3 {
     grid-area: 3 / 3 / 4 / 4;
     align-self: center;
     height: 100%;
-    margin: 2px;
-    border-style: dashed;
+    margin: 4px;
 }
 
 .plot4 {
     grid-area: 3 / 4 / 4 / 5;
     align-self: center;
     height: 100%;
-    margin: 2px;
-    border-style: dashed;
+    margin: 4px;
 }
 
-.download-results-graph {
-     grid-area: 4 / 1 / 5 / 5;
+.download-graph-data {
+    grid-area: 4 / 1 / 5 / 5;
+    display: flex;
+    justify-content: flex-start;
+    align-self: flex-start;
+    margin-left: 20px;
 }
-
 
 /************************ Media Queries ************************/
 @media only screen and (max-width: 1300px) {
@@ -409,47 +469,92 @@ tr:nth-child(even) {
     }
 
     /******************* Target Visualization page *******************/
-    .sky-map {
-        margin-top: 20px;
+    .main-container-target-visualization {
+        height: 130vh;
+    }
+
+    .sky-map,
+    .query-container {
+        padding-top: 30px;
+    }
+
+    .sky-map h2,
+    .query-container h2 {
+        margin-bottom: 10px;
+        font-size: 1.3rem;
+    }
+
+    .sky-map h3,
+    .query-container h3 {
+        font-size: 1rem;
+    }
+
+    #form-sky p,
+    .query-container p {
+        margin: 10px 0;
+        font-size: 1.1rem;
     }
 
     .search-input {
         margin: 10px 0 0 0;
     }
 
-    #form-csv-upload-skymap {
+    #form-csv-upload-target-data {
     margin-bottom: 0;
     }
 
-    .search-csv {
+    .query-list {
         width: 90%;
         margin: 0;
     }
 
-    .search-csv-buttons {
+    .query-list-input {
       display: flex;
       justify-content: center;
-      margin: 10px 0;
+      margin-top: 10px;
     }
 
-    .query-input-RA {
-        width: 200px;
+    .query-input-RA,
+    #target {
+        width: 160px;
     }
 
     .query-input-radius {
-        width: 100px;
+        width: 70px;
     }
 
     .query-input-sector {
         width: 145px;
     }
 
-    .search-csv h2 {
+    .query-list h2 {
         text-align: center;
     }
 
     .results-container {
         margin-top: 10px;
         margin-bottom: 5px;
+    }
+
+    tbody td {
+        font-size: .9rem;
+    }
+
+    /******************* Target List page *******************/
+    .main-container-target-list {
+        height: 130vh;
+    }
+
+    .target-list-input-container {
+        margin: 10px 10px 50px 10px;
+
+    }
+
+    .target-list-input-container h2 {
+        font-size: 1.3rem;
+    }
+
+    .target-list-input-container h3 {
+        font-size: 1rem;
     }
 }

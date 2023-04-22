@@ -1,3 +1,16 @@
+"""
+This script contains two main functions, csv_upload and download, that handle the processing
+and downloading of CSV files in a Flask web application. The csv_upload function processes
+uploaded CSV files based on request parameters and returns either a JSON response or a
+rendered HTML template with results. The download function takes processed results and
+generates a downloadable CSV file, returning it as a Flask response.
+
+Dependencies:
+- io.StringIO: Used for reading and writing CSV contents in-memory.
+- csv: Used for working with CSV files.
+- flask: 
+- .sector_processing: Custom module for processing sector data.
+"""
 from io import StringIO
 import csv
 from flask import request, render_template, url_for, make_response, jsonify
@@ -5,6 +18,15 @@ from .sector_processing import process_csv, get_targets_from_uploaded_csv
 
 
 def csv_upload():
+    """
+    Handle the CSV file upload and process it according to the request type.
+    
+    This function checks if the request is for the sky map or the query table,
+    then processes the uploaded CSV file accordingly and returns the results.
+    
+    @returns {JSON or Flask Response} - A JSON response for sky map requests or a Flask response for query table requests.
+    """
+
     # Check if the request is for the sky map
     if 'csv_file' in request.files and 'radius' not in request.form:
         uploaded_csv_file = request.files['csv_file']
@@ -58,6 +80,15 @@ def csv_upload():
 
 
 def download():
+    """
+    Generate a downloadable CSV file from the provided results.
+    
+    This function takes the results of the processed CSV file and generates a new
+    CSV file for downloading. It returns the generated CSV data as a response with
+    appropriate headers set for downloading.
+    
+    @returns {Flask Response} - A Flask response containing the generated CSV data for downloading.
+    """
     results = request.args.getlist('results')
 
     # Create a dictionary to store the data

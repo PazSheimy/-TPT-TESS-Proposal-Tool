@@ -1,8 +1,28 @@
+"""
+This module provides a function to query the TESS Input Catalog (TIC) for metadata associated with 
+celestial objects, based on their coordinates, object names, or TIC IDs. It utilizes the astroquery 
+library to interact with the TIC catalog.
+
+Dependencies:
+    - astropy
+    - astroquery
+"""
 from astropy import units as u
 from astroquery.mast import Catalogs
 
 
 def get_metadata(coords=None, object_names=None, tic_ids=None):
+    """Queries the TIC catalog for metadata associated with celestial objects.
+
+    Args:
+        coords (list, optional): A list of SkyCoord objects representing the celestial coordinates.
+        object_names (list, optional): A list of object names.
+        tic_ids (list, optional): A list of TESS Input Catalog (TIC) IDs.
+
+    Returns:
+        list: A list of tuples containing metadata for each celestial object: 
+              (luminosity, temperature, star_name, magnitudes, distance).
+    """
     metadata_list = []
 
     if coords:
@@ -23,42 +43,18 @@ def get_metadata(coords=None, object_names=None, tic_ids=None):
         return None
 
     results = []
+
+    # For each metadata entry and star name, it calculates the luminosity and temperature,
+    # and extracts the magnitudes and distance from the metadata. The extracted values are then appended
+    # as a tuple to the results list.
     for metadata, star_name in metadata_list:
         luminosity = metadata['lum'] * u.solLum
         temperature = metadata['Teff'] * u.K
         magnitudes = metadata['Tmag']
         distance = metadata['dstArcSec']
+
+        # Append the extracted values as a tuple to the results list
         results.append((luminosity, temperature, star_name, magnitudes, distance))
 
     return results
 
-
-
-# def get_metadata(coord, object_name, tic_id):
-#     # Check if the input is a coordinate
-#     if coord:
-#         # Query the metadata of the star using the coordinate
-#         metadata = Catalogs.query_region(
-#             coord, radius=30 * u.arcmin, catalog="Tic")
-#         star_name = f"{coord.ra.degree} {coord.dec.degree}"
-#     # Check if the input is an object name
-#     elif object_name:
-#         # Query the metadata of the star using the object name
-#         metadata = Catalogs.query_object(object_name, catalog="Tic")
-#         star_name = object_name
-#     # Check if the input is a TIC ID
-#     elif tic_id:
-#         # Query the metadata of the star using the TIC ID
-#         metadata = Catalogs.query_object(tic_id, catalog="Tic")
-#         star_name = "TIC " + tic_id
-#     else:
-#         # Return None if no input is provided
-#         return None
-
-#     # Retrieve the luminosity and temperature from the metadata
-#     luminosity = metadata['lum'] * u.solLum
-#     temperature = metadata['Teff'] * u.K
-#     magnitudes = metadata['Tmag']
-#     distance = metadata['dstArcSec']
-
-#     return luminosity, temperature, star_name, magnitudes, distance

@@ -1,3 +1,14 @@
+"""
+This module contains functions for rendering the main page and generating an HR Diagram, Sector Graph, Distance Histogram.
+Magnitud Histogram
+
+Dependencies:
+- flask
+- bokeh
+- numpy
+- astropy
+"""
+
 from bokeh.plotting import figure
 from bokeh.resources import Resources
 from bokeh.embed import file_html
@@ -12,89 +23,36 @@ from bokeh.palettes import RdYlBu11
 from bokeh.transform import linear_cmap
 
 
+
+
 def index():
+
+    """
+    Render the main index page with a hidden table container.
+
+    Returns:
+        A rendered HTML template for the index page.
+    """
     # sets <table> container visibility to 'hidden' upon page load
     table_visibility = 'hidden'
 
     return render_template("index.html", table_visibility=table_visibility)
 
-# def default_hr_diagram():
-#     example_stars = [
-#         {"name": "Sun", "luminosity": 1.0, "temperature": 5778},
-#         {"name": "Betelgeuse", "luminosity": 120000, "temperature": 3590},
-#         {"name": "Sirius B", "luminosity": 0.0026, "temperature": 25100},
-#         # Add more stars if needed
-#     ]
-
-#     luminosities = [star["luminosity"] for star in example_stars]
-#     temperatures = [star["temperature"] for star in example_stars]
-#     print(luminosities,temperatures)
-
-#     return luminosities, temperatures
-
-# def hr_diagram(luminosities, temperatures, title, additional_luminosities=None, additional_temperatures=None):
-#     luminosities = [math.log10(lum) for lum in luminosities]
-#     temperatures = [math.log10(temp) for temp in temperatures]
-
-#     # Add the additional points if provided
-#     if additional_luminosities and additional_temperatures:
-#         additional_luminosities = [math.log10(lum.value) for lum in additional_luminosities]
-#         additional_temperatures = [math.log10(temp.value) for temp in additional_temperatures]
-#         luminosities.extend(additional_luminosities)
-#         temperatures.extend(additional_temperatures)
-
-#     # Filter out invalid temperature values
-#     filtered_data = [(t, l) for t, l in zip(temperatures, luminosities) if not (math.isnan(t) or math.isnan(l))]
-#     filtered_temperature, filtered_luminosity = zip(*filtered_data)
-
-#     # Extract the float values from the Quantity objects
-#     float_filtered_temperature = [t for t in filtered_temperature]
-#     float_filtered_luminosity = [l for l in filtered_luminosity]
-
-#     # Create a ColumnDataSource with the filtered data
-#     source = ColumnDataSource(data=dict(
-#         temperature=filtered_temperature,
-#         luminosity=filtered_luminosity,
-#         float_luminosity=float_filtered_luminosity
-#     ))
-
-#     # Create a figure with the title HR Diagram for [star_name]
-#     p = figure(title=f"HR Diagram for {title}", x_axis_type="log", y_axis_type="log")
-
-#     # Create a custom color palette
-#     custom_palette = RdYlBu11[::-1][1:]  # Remove the darkest red
-
-#     # Use the custom palette in the linear_cmap function
-#     color_mapper = linear_cmap(field_name='temperature', palette=custom_palette, low=min(filtered_temperature), high=max(filtered_temperature))
-
-#     # Add a scatter plot of temperature vs. luminosity to the figure with color mapping
-#     p.circle(x='temperature', y='luminosity', color=color_mapper, source=source)
-
-#     # Label the x-axis as Temperature (K)
-#     p.xaxis.axis_label = "Temperature (K)"
-
-#     # Label the y-axis as Luminosity (L_sun)
-#     p.yaxis.axis_label = "Luminosity (L_sun)"
-
-#     # Set the y_range to be flipped
-#     p.y_range.flipped = False
-
-#     # Reverse the x-axis
-#     p.x_range = Range1d(start=max(float_filtered_temperature), end=min(float_filtered_temperature))
-
-#     # Set the sizing mode of the component
-#     p.sizing_mode = "scale_both"
-
-#     # Set the mode of resources to cdn for faster loading
-#     resources = Resources(mode='cdn')
-
-#     # Create HTML file from figure with the specified title
-#     html1 = file_html(p, resources=resources, title=f"HR Diagram for {title}")
-
-#     return html1
-
 
 def hr_diagram(luminosity, temperature, star_name):
+    """
+    Generate an HR Diagram for the given star data.
+
+    Args:
+        luminosity (list): A list of luminosity values for the star.
+        temperature (list): A list of temperature values for the star.
+        star_name (str): The name of the star.
+
+    Returns:
+        An HTML string containing the generated HR Diagram.
+    """
+
+
     print("Temperature:", temperature)
     print("Luminosity:", luminosity)
 
@@ -115,7 +73,7 @@ def hr_diagram(luminosity, temperature, star_name):
     ))
 
     #Create a custom color palette
-    custom_palette = RdYlBu11[::-1][1:]  # Remove the darkest red
+    custom_palette = RdYlBu11[::-1][1:]  # To remove the darkest red
 
 
     # Create a figure with the title HR Diagram for [star_name]
@@ -137,7 +95,7 @@ def hr_diagram(luminosity, temperature, star_name):
     # Set the y_range to be flipped
     p.y_range.flipped = False
 
-    # Reverse the x-axis
+    # Reverse the x-axis to get values from max to min
     p.x_range = Range1d(start=max(float_filtered_temperature), end=min(float_filtered_temperature))
 
     # Set the sizing mode of the component
@@ -148,18 +106,28 @@ def hr_diagram(luminosity, temperature, star_name):
 
     # Create HTML file from figure with the specified title
     html1 = file_html(p, resources=resources, title=f"HR Diagram for {star_name}")
-
+    
+    # Create HTML file from figure with the specified title
     return html1
   
 def generate_magnitude_histogram(star_name, magnitudes):
+    """
+    Generate a histogram of TESS magnitudes for a given star.
 
-    if not magnitudes:  # Add this check to ensure the input array is not empty
+    Args:
+        star_name (str): The name of the star.
+        magnitudes (list): A list of TESS magnitudes for the star.
+
+    Returns:
+        An HTML string containing the generated magnitude histogram, or None if the magnitudes list is empty.
+    """
+    
+    # Return None if the input magnitudes list is empty
+    if not magnitudes:  
         return None
     
-    
-    min_value = np.min(magnitudes)
-    max_value = np.max(magnitudes)
-    hist, edges = np.histogram(magnitudes, bins=200)
+    # Compute the histogram data using numpy
+    hist, edges = np.histogram(magnitudes, bins="auto")
 
     # Define the data source for the histogram
     source = ColumnDataSource(data=dict(
@@ -174,11 +142,15 @@ def generate_magnitude_histogram(star_name, magnitudes):
                x_axis_label='Magnitude', y_axis_label='Frequency')
     p.quad(top='top', bottom='bottom', left='left',
            right='right', source=source)
+    
 
+    # Set the x-axis label
     p.xaxis.axis_label = "TESS Magnitude"
+
+    # Set the y-axis label
     p.yaxis.axis_label = "Density"
 
-    # how the component should size itself
+    # Set the sizing mode of the component to scale with window size
     p.sizing_mode = "scale_both"
 
     # Generate the HTML for the magnitude histogram
@@ -190,11 +162,20 @@ def generate_magnitude_histogram(star_name, magnitudes):
 
 
 def distance_histogram(star_name, distance):
-    # Generate some sample data
-    distances = distance
+    """
+    Generate a histogram of distances for a given star.
 
-    # Create a histogram of the distances
-    hist, edges = np.histogram(distances, bins=50)
+    Args:
+        star_name (str): The name of the star.
+        distance (list): A list of distances for the star in parsecs.
+
+    Returns:
+        An HTML string containing the generated distance histogram.
+    """
+
+
+    # Create a histogram of the distances using numpy
+    hist, edges = np.histogram(distance, bins=50)
 
     # Define the data source for the histogram
     source = ColumnDataSource(data=dict(
@@ -210,11 +191,10 @@ def distance_histogram(star_name, distance):
     p.quad(top='top', bottom='bottom', left='left',
            right='right', source=source, line_color="#033649")
 
-    # how the component should size itself
+    # Set the sizing mode of the component to scale with window size
     p.sizing_mode = "scale_both"
 
-    # shows the histogram of distances with the x-axis showing the distance in parsecs and
-    # the y-axis showing the frequency of each distance.
+    # Generate the HTML for the distance histogram
     resources = Resources(mode='cdn')
     html3 = file_html(p, resources=resources,
                       title=f"Magnitude Histogram for {star_name}")
@@ -222,6 +202,20 @@ def distance_histogram(star_name, distance):
 
 
 def sector_graph(object_name, results, cycle):
+    """
+    Generate a bar graph of observed sectors for a given object.
+
+    Args:
+        object_name (str): The name of the object.
+        results (list): A list of lists, where each inner list contains
+                        sector, cycle, camera, and observation date information.
+        cycle (int): The cycle number.
+
+    Returns:
+        An HTML string containing the generated sector graph.
+    """
+
+    # Extract the sector, cycle, camera, and observation date information from the results list
     sectors = []
     cycles = []
     cameras = []
@@ -237,14 +231,18 @@ def sector_graph(object_name, results, cycle):
         cameras.append(camera)
         observation_dates.append(observation_date)
 
+    # Create a ColumnDataSource with the extracted data
     source = ColumnDataSource(data=dict(sectors=sectors, cycles=cycles, cameras=cameras, observation_dates=observation_dates))
 
+    # Create a Bokeh figure object with appropriate labels
     p = figure(title='Observed Sectors',
            x_axis_label='Sector', y_axis_label='Cycle')
 
+    # Add vertical bars to the figure
     p.vbar(x='sectors', top='cycles', source=source,
            width=0.9, line_color="#033649")
-
+    
+    # Set the start values for the x and y ranges
     p.x_range.start = 0
     p.y_range.start = 0
 
@@ -260,7 +258,8 @@ def sector_graph(object_name, results, cycle):
 
     # Add the button to a layout and then add the layout to the plot
     layout = column(p, download_button, sizing_mode="fixed", width=400, height=450)
-
+ 
+    # Generate the HTML for the sector graph
     resources = Resources(mode='cdn')
     html4 = file_html(layout, resources=resources,
                       title=f"Sectors Observed for {object_name}")
