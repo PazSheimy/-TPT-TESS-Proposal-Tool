@@ -24,8 +24,6 @@ from bokeh.transform import linear_cmap
 from bokeh.models.tickers import FixedTicker
 
 
-
-
 def index():
 
     """
