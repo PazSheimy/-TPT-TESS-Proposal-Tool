@@ -18,11 +18,7 @@ Python (version 3.6 or later)
 pip (Python Package Installer)
 
 # Installation
-1- Clone the repository to your local machine:
-
-[Clone](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git)
-
-https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
+1- Clone the repository to your local machine [Here](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git)
 
 
 2- Create a virtual environment and activate it: (optional)
@@ -37,11 +33,14 @@ https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
 
 pip install -r requirements.txt
 
+
 4- Run the web application locally:
 
 python main.py
 
+
 5- Open your web browser and navigate to http://127.0.0.1:5000 to view the application.
+
 
 # Usage
 1- Navigate to the "Sky Map" page to visualize satellite targets on a sky map.
