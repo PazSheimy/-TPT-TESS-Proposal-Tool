@@ -23,11 +23,11 @@ https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
 
 2- Create a virtual environment and activate it: (optional)
 
-python -m venv venv
+  - python -m venv venv
 
-source venv/bin/activate  # For Linux/Mac
+  - source venv/bin/activate  # For Linux/Mac
 
-venv\Scripts\activate  # For Windows
+  - venv\Scripts\activate  # For Windows
 
 3- Install the required dependencies:
 pip install -r requirements.txt
