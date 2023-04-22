@@ -54,8 +54,8 @@ Feel free to submit issues, feature requests, and pull requests.
 
 
 # Images: 
-Basic layout
-![tess_basic_layout](https://user-images.githubusercontent.com/51823622/212510485-9d1bb208-7b4e-4552-b048-af1479adb2bf.png)
+
+![tess_basic_layout](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/Images%20File/homescreen.png)
 
 ![tess_basic_layout](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/TPTborn(1152).png)
 
