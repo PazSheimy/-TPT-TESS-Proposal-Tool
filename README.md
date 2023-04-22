@@ -45,11 +45,12 @@ python main.py
 3- You can download the graph data for further analysis.
 
 4- csv files example to download:
-[Tic id:](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv)
 
-[Target Name:](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv)
+[Tic id](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv)
 
-[Ra, Dec:](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/fiveradecdata.csv)
+[Target_Name](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv)
+
+[Ra, Dec](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/fiveradecdata.csv)
 
 
 # Contributing
