@@ -19,7 +19,9 @@ pip (Python Package Installer)
 
 # Installation
 1- Clone the repository to your local machine:
-https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
+
+[Clone](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git)
+
 
 2- Create a virtual environment and activate it: (optional)
 
@@ -30,9 +32,11 @@ https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool.git
   - venv\Scripts\activate  # For Windows
 
 3- Install the required dependencies:
+
 pip install -r requirements.txt
 
 4- Run the web application locally:
+
 python main.py
 
 5- Open your web browser and navigate to http://127.0.0.1:5000 to view the application.
