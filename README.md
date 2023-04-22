@@ -46,7 +46,7 @@ python main.py
 
 4- csv files example to download:
 
-[Tic id](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv)
+[Tic_id](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/TIC3inputs.csv)
 
 [Target_Name](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/csv%20files%20to%20test/5targnamesneartoeachother.csv)
 
