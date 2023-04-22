@@ -21,6 +21,7 @@ from bokeh.models import Range1d
 import math
 from bokeh.palettes import RdYlBu11
 from bokeh.transform import linear_cmap
+from bokeh.models.tickers import FixedTicker
 
 
 
@@ -141,7 +142,7 @@ def generate_magnitude_histogram(star_name, magnitudes):
     p = figure(title=f"{star_name} Magnitude Histogram",
                x_axis_label='Magnitude', y_axis_label='Frequency')
     p.quad(top='top', bottom='bottom', left='left',
-           right='right', source=source)
+           right='right', source=source, line_color='black')
     
 
     # Set the x-axis label
@@ -246,6 +247,9 @@ def sector_graph(object_name, results, cycle):
     p.x_range.start = 0
     p.y_range.start = 0
 
+    # Set the y-axis to use whole numbers
+    max_cycle = max(cycles) + 1
+    p.yaxis.ticker = FixedTicker(ticks=list(range(max_cycle)))
 
     # Add the BoxSelectTool to the plot
     p.add_tools(BoxSelectTool())
@@ -257,7 +261,7 @@ def sector_graph(object_name, results, cycle):
 
 
     # Add the button to a layout and then add the layout to the plot
-    layout = column(p, download_button, sizing_mode="fixed", width=400, height=450)
+    layout = column(p, download_button, sizing_mode="fixed", width=400, height=350)
  
     # Generate the HTML for the sector graph
     resources = Resources(mode='cdn')
