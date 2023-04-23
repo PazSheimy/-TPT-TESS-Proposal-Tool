@@ -262,7 +262,7 @@ def sector_graph(object_name, results, cycle):
 
 
     # Add the button to a layout and then add the layout to the plot
-    layout = column(p, download_button, sizing_mode="fixed", width=400, height=350)
+    layout = column(p, download_button, sizing_mode="fixed", width=300, height=300)
  
     # Generate the HTML for the sector graph
     resources = Resources(mode='cdn')
