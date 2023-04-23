@@ -153,9 +153,7 @@ h1 {
     font-size: 1.5rem;
     text-align: center;
 }
-
-
-
+W
 .tool-container {
     display: flex;
     flex-direction: row;
@@ -179,8 +177,6 @@ h1 {
     background: rgba(236, 28, 36, 0.25);
     cursor: pointer;
 }
-
-
 
 .tool-visualization {
     margin-right: 30px;
@@ -240,12 +236,6 @@ h1 {
     color: #ccd1d1;
 }
 
-.sky-map .or {
-    margin: 20px 0;
-    font-size: 1.3rem;
-    color: white;
-}
-
 #form-sky button {
     margin-top: 20px;
     width: 50%;
@@ -258,7 +248,6 @@ h1 {
 #target {
     width: 200px;
 }
-
 
 /************************ Target Visualization - Query Container ************************/
 .query-container {
@@ -410,7 +399,6 @@ input {
 
 table {
     table-layout: fixed;
-    /*width: 75%;*/
     border-collapse: collapse;
 }
 
@@ -466,28 +454,32 @@ tr:nth-child(even) {
 .plot1 {
     grid-area: 3 / 1 / 4 / 2;
     align-self: center;
-    height: 100%;
+    height: 300px;
+    width: 300px;
     margin: 4px;
 }
 
 .plot2 {
     grid-area: 3 / 2 / 4 / 3;
     align-self: center;
-    height: 100%;
+    height: 300px;
+    width: 300px;
     margin: 4px;
 }
 
 .plot3 {
     grid-area: 3 / 3 / 4 / 4;
     align-self: center;
-    height: 100%;
+    height: 300px;
+    width: 300px;
     margin: 4px;
 }
 
 .plot4 {
     grid-area: 3 / 4 / 4 / 5;
     align-self: center;
-    height: 100%;
+    height: 300px;
+    width: 300px;
     margin: 4px;
 }
 
@@ -540,11 +532,16 @@ tr:nth-child(even) {
 
     .sky-map h3,
     .query-container h3 {
-        font-size: 1rem;
+        font-size: .95rem;
     }
 
-    #form-sky p,
-    .query-container p {
+    .h3-icon-row img {
+        margin-left: 2px;
+        padding-bottom: 2px;
+        scale: .6;
+    }
+
+    .or {
         margin: 10px 0;
         font-size: 1.1rem;
     }
