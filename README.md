@@ -40,7 +40,7 @@ and allows the user to highlight the desire sector information to download it. U
 path for this feature to work when app is being runned locally 
 
 code:
-# Create a button for downloading the selected data
+#Create a button for downloading the selected data
     download_button = Button(label="Download", button_type="success")
     download_button.js_on_click(CustomJS(args=dict(source=source),
                             code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\utils\\download.js").read()))
