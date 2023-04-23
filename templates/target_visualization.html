@@ -69,9 +69,21 @@ Technologies used:
                 <div class="sky-map-right-group">
                     <form id="form-sky" method="post" enctype="multipart/form-data">
                         <h2>Sky Map</h2>
-                        <h3>Single target search:</h3>
+                        <div class="h3-icon-row">
+                        <h3>Search by RA, Dec, Object Name, TIC ID</h3>
+                        <div class="btn btn-primary tooltip">
+                            <img  src="static/icons8-info.svg" alt="information-icon">
+                            <div class="top">
+                                    <h3>Target Examples</h3>
+                                    <p>Name: Cyg X-1</p>
+                                    <p>Coordinates: 101.295, -16.699</p>
+                                    <p>TIC ID: 268644785</p>
+                                    <i></i>
+                                </div>
+                            </div>
+                        </div>
                         <input type="text" id="target" name="target" value="{{ target }}" placeholder="Target">
-                        <p>Or</p>
+                        <p class="or">Or</p>
                         <h3>Upload list of targets:</h3>
                         <input type="file" id="csv-file" name="csv_file" accept=".csv">
                         <hr>
@@ -83,7 +95,19 @@ Technologies used:
             <div class="query-container">
                 <div class="query-single-target">
                     <h2>Target Data</h2>
-                    <h3>Search by RA, Dec, Object Name, TIC ID</h3>
+                    <div class="h3-icon-row">
+                        <h3>Search by RA, Dec, Object Name, TIC ID</h3>
+                        <div class="btn btn-primary tooltip">
+                            <img  src="static/icons8-info.svg" alt="information-icon">
+                            <div class="top">
+                                <h3>Target Examples</h3>
+                                <p>Name: Cyg X-1</p>
+                                <p>Coordinates: 101.295, -16.699</p>
+                                <p>TIC ID: 268644785</p>
+                                <i></i>
+                            </div>
+                        </div>
+                    </div>
                     <form id="form-search" action="/sectors" method="post">
                         <input class="query-input-RA" id="search_input" type="text" name="search_input"
                             placeholder="Target">
@@ -91,14 +115,9 @@ Technologies used:
                         <input class="query-input-sector" type="number" id="sector" name="sector"
                             placeholder="Sector (optional)">
                         <input type="submit" value="Search">
-                        <p style="font-size: 0.9em; color: #5b7fb2; margin-top: 5px;">
-                            e.g., Cyg X-1 or<br>
-                            101.295, -16.699 or<br>
-                            TIC ID such as 268644785
-                        </p>
                     </form>
                 </div>
-                <p>Or</p>
+                <p class="or">Or</p>
                 <form id="form-csv-upload-target-data" action="/csv_upload" method="post" enctype="multipart/form-data">
                     <div class="query-list">
                         <h3>Upload list of targets</h3>
