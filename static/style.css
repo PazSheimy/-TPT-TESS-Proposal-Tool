@@ -122,7 +122,7 @@ h1 {
     }
 }
 
-/************************ Index page content styles (Index - divs) ************************/
+/************************ Index page ************************/
 .secondary-container-index {
     grid-area: 2 / 1 / 5 / 5;
     display: flex;
@@ -240,7 +240,7 @@ h1 {
     color: #ccd1d1;
 }
 
-#form-sky p {
+.sky-map .or {
     margin: 20px 0;
     font-size: 1.3rem;
     color: white;
@@ -269,7 +269,7 @@ h1 {
     padding-top: 40px;
 }
 
-.query-container p {
+.or {
     margin: 20px 0;
     font-size: 1.3rem;
     color: white;
@@ -298,6 +298,67 @@ h1 {
 input {
     outline: none;
 }
+
+.h3-icon-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.h3-icon-row img {
+    margin-left: 4px;
+    padding-bottom: 4px;
+    scale: .8;
+
+}
+
+.tooltip {
+    display:inline-block;
+    position:relative;
+    text-align:center;
+}
+
+.tooltip .top {
+    min-width:200px;
+    top:-20px;
+    left:50%;
+    transform:translate(-50%, -100%);
+    color:#ccd1d1;;
+    background-color:#140829;
+    position:absolute;
+    z-index:1;
+    box-sizing:border-box;
+    box-shadow:0 1px 8px rgba(0,0,0,0.5);
+    visibility:hidden; opacity:0; transition:opacity 0.8s;
+}
+
+.tooltip:hover .top {
+    visibility:visible; opacity:1;
+}
+
+.tooltip .top i {
+    position:absolute;
+    top:100%;
+    left:50%;
+    margin-left:-12px;
+    width:24px;
+    height:12px;
+    overflow:hidden;
+}
+
+.tooltip .top i::after {
+    content:'';
+    position:absolute;
+    left:50%;
+    transform:translate(-50%,-50%) rotate(45deg);
+    background-color:#000000;
+    box-shadow:0 1px 8px rgba(0,0,0,0.5);
+}
+
+.top p {
+    font-size: .8rem;
+}
+
 
 #form-csv-upload-target-data {
     margin-bottom: 30px;
@@ -430,13 +491,6 @@ tr:nth-child(even) {
     margin: 4px;
 }
 
-.download-graph-data {
-    grid-area: 4 / 1 / 5 / 5;
-    display: flex;
-    justify-content: flex-start;
-    align-self: flex-start;
-    margin-left: 20px;
-}
 
 /************************ Media Queries ************************/
 @media only screen and (max-width: 1300px) {
