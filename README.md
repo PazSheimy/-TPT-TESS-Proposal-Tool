@@ -34,13 +34,27 @@ pip (Python Package Installer)
 
 pip install -r requirements.txt
 
+4- Inside of utils there is a file named visualization.py that has a function 
+def sector_graph. this function creates a graph based on the sectors that have been observed 
+and allows the user to highlight the desire sector information to download it. User will have to change the 
+path for this feature to work when app is being runned locally 
 
-4- Run the web application locally:
+code:
+# Create a button for downloading the selected data
+    download_button = Button(label="Download", button_type="success")
+    download_button.js_on_click(CustomJS(args=dict(source=source),
+                            code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\utils\\download.js").read()))
+                        
+this is how it works for my, you should be able to make it work by changing it to your personal path.
+
+
+
+5- Run the web application locally:
 
 python main.py
 
 
-5- Open your web browser and navigate to http://127.0.0.1:5000 to view the application.
+6- Open your web browser and navigate to http://127.0.0.1:5000 to view the application.
 
 
 # Usage
