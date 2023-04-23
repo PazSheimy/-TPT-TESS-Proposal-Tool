@@ -1,5 +1,39 @@
+/**
+ * This script handles the creation and interaction of an Aladin Lite sky map.
+ * It supports adding targets to the map through user input, TIC ID, or uploading a CSV file.
+ * 
+ * Dependencies:
+ * - Aladin Lite: https://aladin.u-strasbg.fr/AladinLite/
+ * - jQuery: https://jquery.com/
+ * 
+ * Functions:
+ * - add_target_to_sky_map(aladin, aladinOverlay, ra, dec, target_name, color)
+ *   Adds a target marker to the sky map, along with a circle around the target.
+ * 
+ * - handle_uploaded_csv(aladin, uploaded_csv_file)
+ *   Reads the uploaded CSV file, extracts target information, and adds targets to the sky map.
+ * 
+ * Events:
+ * - Form submission event
+ *   Handles user input for target name, RA/DEC coordinates, or TIC ID, and adds targets to the sky map.
+ *   Also, handles the uploading of a CSV file containing target information.
+ */
+
+
+// Create an overlay to draw circles around targets and a catalog to store the target markers
 var aladinOverlay = A.graphicOverlay({ color: "#ee2345", lineWidth: 3 });
 var aladinCatalog = A.catalog({ name: "Targets", onClick: "showPopup" });
+
+/**
+ * Adds a target marker to the sky map, along with a circle around the target.
+ *
+ * @param {Object} aladin - The Aladin Lite instance.
+ * @param {Object} aladinOverlay - The Aladin Lite overlay instance.
+ * @param {number} ra - The right ascension of the target.
+ * @param {number} dec - The declination of the target.
+ * @param {string} target_name - The name of the target.
+ * @param {string} [color="blue"] - The color of the marker.
+ */
 
 function add_target_to_sky_map(
   aladin,
@@ -26,6 +60,14 @@ function add_target_to_sky_map(
   // Add a circle around the target
   aladinOverlay.add(A.circle(ra, dec, 0.04, { color: "red" }));
 }
+
+/**
+ * Reads the uploaded CSV file, extracts target information, and adds targets to the sky map.
+ *
+ * @param {Object} aladin - The Aladin Lite instance.
+ * @param {File} uploaded_csv_file - The uploaded CSV file containing target information.
+ */
+
 function handle_uploaded_csv(aladin, uploaded_csv_file) {
   // Make an AJAX request to your Flask route with the uploaded CSV file
   var formData = new FormData();
@@ -48,6 +90,13 @@ function handle_uploaded_csv(aladin, uploaded_csv_file) {
       var sumDec = 0;
       var numTargets = data.length;
 
+      /**
+ * Processes a single target, adds it to the sky map, and updates the RA and DEC sums.
+ *
+ * @param {Object} target - The target object containing target information.
+ * @param {number} ra - The right ascension of the target.
+ * @param {number} dec - The declination of the target.
+ */
       function processTarget(target, ra, dec) {
         console.log("Adding target to sky map:", target);
         add_target_to_sky_map(
@@ -63,6 +112,7 @@ function handle_uploaded_csv(aladin, uploaded_csv_file) {
 
         // Check if all targets have been processed
         if (aladinCatalog.getSources().length === numTargets) {
+
           // Calculate the average RA and DEC, and move the sky map to that position
           var avgRa = sumRa / numTargets;
           var avgDec = sumDec / numTargets;
@@ -114,8 +164,7 @@ function handle_uploaded_csv(aladin, uploaded_csv_file) {
   });
 }
 
-// Then, initialize the Aladin Lite instance and set up the form submission event
-
+// Initialize the Aladin Lite instance with the given target and settings
 var target = "{{ target }}";
 var aladin = A.aladin("#aladin-lite-div", {
   target: target,
@@ -124,18 +173,24 @@ var aladin = A.aladin("#aladin-lite-div", {
   reticleColor: "#ffeb3b",
   reticleSize: 22,
 });
+
+// Add the catalog and overlay to the Aladin Lite instance
 aladin.addCatalog(aladinCatalog);
 aladin.addOverlay(aladinOverlay);
+
+// Set up the form submission event to handle user input
 $("form").submit(function (event) {
-  event.preventDefault();
-  target = $("#target").val();
+  event.preventDefault(); // Prevent the default form submission behavior
+  target = $("#target").val(); // Get the target input value from the form
   console.log("Form submitted, target:", target);
 
+  // Prepare the FormData object for a potential CSV file upload
   var formData = new FormData();
   formData.append("csv_file", $("#csv-file")[0].files[0]);
 
+  // If a target is provided, handle the input based on its format
   if (target) {
-    // Check if the input is in RA/Dec format
+    //handling target input (RA/Dec, TIC ID, or name) checking input format
     var raDecPattern = /^(\s*-?\d+(\.\d*)?)\s*,\s*(-?\d+(\.\d*)?)\s*$/;
     var raDecMatch = target.match(raDecPattern);
 
@@ -188,7 +243,7 @@ $("form").submit(function (event) {
     }
   }
 
-  // Check if a CSV file is uploaded
+  // If a CSV file is uploaded, handle the file and add markers to the sky map
   if ($("#csv-file")[0].files[0]) {
     // Call handle_uploaded_csv() function to upload CSV file and add markers to the sky map
     handle_uploaded_csv(aladin, $("#csv-file")[0].files[0]);
