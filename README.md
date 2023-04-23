@@ -2,7 +2,7 @@
 TESS proposal tool (TPT) is a web app that helps users propose for time to deeply look at targets and helps users visualize what is observed and when. the system goal is to make the satellite data accessible for users through features like:
  Sky map: where users can locate and examine targets of importance.
  
- Target Date: where users can search for target by Ra/Dec, Object name, or TIC id to query information like 
+ Target Data: where users can search for target by Ra/Dec, Object name, or TIC id to query information like 
  The sector of observation, cycle, camera, and observation date.
  
  Diagram page: where users can upload a list of targets to analyze them in HR diagrams, Magnitude histograms.
