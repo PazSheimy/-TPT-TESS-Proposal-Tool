@@ -87,8 +87,23 @@ Technologies used:
                         <h3>Upload list of targets:</h3>
                         <input type="file" id="csv-file" name="csv_file" accept=".csv">
                         <hr>
+                        <div class="radio-buttons">
+                            <input type="radio" id="radio1" name="radio_sector" value="sector1">
+                            <label for="radio1">Sector 1</label><br>
+                            <input type="radio" id="radio2" name="radio_sector" value="sector2">
+                            <label for="radio2">Sector 2</label><br>
+                            <input type="radio" id="radio3" name="radio_sector" value="sector3">
+                            <label for="radio3">Sector 3</label><br>
+                            <input type="radio" id="radio4" name="radio_sector" value="sector4">
+                            <label for="radio4">Sector 4</label><br>
+                            <input type="radio" id="radio5" name="radio_sector" value="sector5">
+                            <label for="radio5">Sector 5</label><br>
+                            <input type="radio" id="radio6" name="radio_sector" value="sector6">
+                            <label for="radio6">Sector 6</label><br>
+                        </div>
                         <button type="submit">Search Sky Map</button>
                     </form>
+                   {# If you want radio buttons to function/select a sector AFTER a query, place the <div> containing radio buttons here #}
                 </div>
                 <script src="{{ url_for('static', filename='skymap.js') }}"></script>
             </div>
