@@ -1,5 +1,5 @@
 # Project Title: TPT-TESS-Proposal-Tool
-TESS proposal tool (TPT) will be a web app that helps users propose for time to deeply look at targets and helps users visualize what is observed and when. the system goal is to make the satellite data accessible for users through features like:
+TESS proposal tool (TPT) is a web app that helps users propose for time to deeply look at targets and helps users visualize what is observed and when. the system goal is to make the satellite data accessible for users through features like:
  Sky map: where users can locate and examine targets of importance.
  
  Target Date: where users can search for target by Ra/Dec, Object name, or TIC id to query information like 
