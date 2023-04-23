@@ -258,7 +258,7 @@ def sector_graph(object_name, results, cycle):
     # Create a button for downloading the selected data
     download_button = Button(label="Download", button_type="success")
     download_button.js_on_click(CustomJS(args=dict(source=source),
-                            code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\utils\\download.js").read()))
+                            code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\static\\download.js").read()))
 
 
     # Add the button to a layout and then add the layout to the plot
