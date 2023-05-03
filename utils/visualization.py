@@ -17,11 +17,12 @@ import numpy as np
 from bokeh.models import ColumnDataSource, BoxSelectTool, Button, CustomJS, LogAxis
 from bokeh.layouts import column
 from astropy import units as u
-from bokeh.models import Range1d
+from bokeh.models import Range1d, CDSView, GroupFilter
 import math
 from bokeh.palettes import RdYlBu11
 from bokeh.transform import linear_cmap
 from bokeh.models.tickers import FixedTicker
+import json
 
 
 def index():
@@ -38,7 +39,7 @@ def index():
     return render_template("index.html", table_visibility=table_visibility)
 
 
-def hr_diagram(luminosity, temperature, star_name):
+def hr_diagram(common_source, star_name):
     """
     Generate an HR Diagram for the given star data.
 
@@ -51,10 +52,8 @@ def hr_diagram(luminosity, temperature, star_name):
         An HTML string containing the generated HR Diagram.
     """
 
-
-    print("Temperature:", temperature)
-    print("Luminosity:", luminosity)
-
+    temperature = common_source.data['temperature']
+    luminosity = common_source.data['luminosity']
 
     # Filter out invalid temperature values
     filtered_data = [(t.value, l.value) for t, l in zip(temperature, luminosity) if not (math.isnan(t.value) or math.isnan(l.value))]
@@ -67,8 +66,7 @@ def hr_diagram(luminosity, temperature, star_name):
     # Create a ColumnDataSource with the filtered data
     source = ColumnDataSource(data=dict(
         temperature=filtered_temperature,
-        luminosity=filtered_luminosity,
-        float_luminosity=float_filtered_luminosity
+        luminosity=filtered_luminosity
     ))
 
     #Create a custom color palette
@@ -97,19 +95,24 @@ def hr_diagram(luminosity, temperature, star_name):
     # Reverse the x-axis to get values from max to min
     p.x_range = Range1d(start=max(float_filtered_temperature), end=min(float_filtered_temperature))
 
-    # Set the sizing mode of the component
-    p.sizing_mode = "scale_both"
+    # Add the BoxSelectTool to the plot
+    p.add_tools(BoxSelectTool())
 
-    # Set the mode of resources to cdn for faster loading
+    # Create a button for downloading the selected data
+    download_button = Button(label="Download", button_type="success")
+    download_button.js_on_click(CustomJS(args=dict(source=source),
+                                code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\static\\download.js").read()))
+
+    # Add the button to a layout and then add the layout to the plot
+    layout = column(p, download_button, sizing_mode="scale_both")
+
     resources = Resources(mode='cdn')
-
-    # Create HTML file from figure with the specified title
-    html1 = file_html(p, resources=resources, title=f"HR Diagram for {star_name}")
+    html1 = file_html(layout, resources=resources, title=f"HR Diagram")
     
     # Create HTML file from figure with the specified title
     return html1
   
-def generate_magnitude_histogram(star_name, magnitudes):
+def generate_magnitude_histogram(common_source, star_name):
     """
     Generate a histogram of TESS magnitudes for a given star.
 
@@ -120,6 +123,7 @@ def generate_magnitude_histogram(star_name, magnitudes):
     Returns:
         An HTML string containing the generated magnitude histogram, or None if the magnitudes list is empty.
     """
+    magnitudes = common_source.data['magnitudes']
     
     # Return None if the input magnitudes list is empty
     if not magnitudes:  
@@ -130,80 +134,88 @@ def generate_magnitude_histogram(star_name, magnitudes):
 
     # Define the data source for the histogram
     source = ColumnDataSource(data=dict(
-        top=hist,
-        bottom=np.zeros_like(hist),
-        left=edges[:-1],
-        right=edges[1:],
+        frequency=hist,
+        lower_edge=np.zeros_like(hist),
+        lower_limit=edges[:-1],
+        upper_limit=edges[1:],
     ))
 
     # Create a Bokeh figure object and add the histogram to it
     p = figure(title=f"{star_name} Magnitude Histogram",
                x_axis_label='Magnitude', y_axis_label='Frequency',
                x_range=(0, max(edges)), y_range=(0, max(hist)))
-    p.quad(top='top', bottom='bottom', left='left',
-           right='right', source=source, line_color='black')
+    p.quad(top='frequency', bottom='lower_edge', left='lower_limit',
+       right='upper_limit', source=source, line_color='black')
     
-
     # Set the x-axis label
     p.xaxis.axis_label = "TESS Magnitude"
 
     # Set the y-axis label
     p.yaxis.axis_label = "Frequency"
 
-    # Set the sizing mode of the component to scale with window size
-    p.sizing_mode = "scale_both"
+    p.add_tools(BoxSelectTool())
+
+    download_button = Button(label="Download", button_type="success")
+    download_button.js_on_click(CustomJS(args=dict(source=source),
+                                code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\static\\download.js").read()))
+
+    layout = column(p, download_button, sizing_mode="scale_both")
 
     # Generate the HTML for the magnitude histogram
     resources = Resources(mode='cdn')
-    html2 = file_html(p, resources=resources,
-                      title=f"Magnitude Histogram for {star_name}")
+    html2 = file_html(layout, resources=resources,
+                      title=f"Magnitude Histogram")
 
     return html2
 
 
-def distance_histogram(star_name, distance):
+def distance_histogram(common_source, star_name):
+
     """
     Generate a histogram of distances for a given star.
 
     Args:
+        common_source (ColumnDataSource): A Bokeh ColumnDataSource containing the star data.
         star_name (str): The name of the star.
-        distance (list): A list of distances for the star in parsecs.
 
     Returns:
         An HTML string containing the generated distance histogram.
     """
 
-    # Create a histogram of the distances using numpy
+    distance = common_source.data['distance']
     hist, edges = np.histogram(distance, bins=50)
 
-    # Define the data source for the histogram
     source = ColumnDataSource(data=dict(
-        top=hist,
-        bottom=np.zeros_like(hist),
-        left=edges[:-1],
-        right=edges[1:],
+        frequency=hist,
+        lower_edge=np.zeros_like(hist),
+        lower_limit=edges[:-1],
+        upper_limit=edges[1:],
     ))
 
-    # Create a Bokeh figure object and add the histogram to it
     p = figure(title="Distance Histogram",
                x_axis_label='Distance (parsecs)', y_axis_label='Frequency',
                x_range=(min(edges), max(edges)), y_range=(0, max(hist)),
-               x_axis_type="log")  # Use a log scale for the x-axis
-    p.quad(top='top', bottom='bottom', left='left',
-           right='right', source=source, line_color="#033649")
+               x_axis_type="log")
+    p.quad(top='frequency', bottom='lower_edge', left='lower_limit',
+       right='upper_limit', source=source, line_color="#033649")
 
-    # Set the sizing mode of the component to scale with window size
-    p.sizing_mode = "scale_both"
+    p.add_tools(BoxSelectTool())
 
-    # Generate the HTML for the distance histogram
+    download_button = Button(label="Download", button_type="success")
+    download_button.js_on_click(CustomJS(args=dict(source=source),
+                                code=open("c:\\Users\\sheim\\Desktop\\tptwebapp\\static\\download.js").read()))
+    
+ 
+
+    layout = column(p, download_button, sizing_mode="scale_both")
+
     resources = Resources(mode='cdn')
-    html3 = file_html(p, resources=resources,
-                      title=f"Distance Histogram for {star_name}")
+    html3 = file_html(layout, resources=resources,
+                      title=f"Distance Histogram")
     return html3
 
 
-
-def sector_graph(object_name, results, cycle):
+def sector_graph(common_source, star_name):
     """
     Generate a bar graph of observed sectors for a given object.
 
@@ -223,17 +235,15 @@ def sector_graph(object_name, results, cycle):
     cameras = []
     observation_dates = []
 
-    for array in results:
-        sector = array[2]
-        observed_cycle = array[4]
-        camera = array[3]
-        observation_date = array[5]
+    for sector, cycle, camera, observation_date in zip(common_source.data['sectors'], common_source.data['cycles'], common_source.data['cameras'], 
+                                                       common_source.data['observation_dates']):
         sectors.append(sector)
-        cycles.append(observed_cycle)
+        cycles.append(cycle)
         cameras.append(camera)
         observation_dates.append(observation_date)
 
-    # Create a ColumnDataSource with the extracted data
+
+    # Create a ColumnDataSource with the extracted data 
     source = ColumnDataSource(data=dict(sectors=sectors, cycles=cycles, cameras=cameras, observation_dates=observation_dates))
 
     # Create a Bokeh figure object with appropriate labels
@@ -262,10 +272,10 @@ def sector_graph(object_name, results, cycle):
 
 
     # Add the button to a layout and then add the layout to the plot
-    layout = column(p, download_button, sizing_mode="fixed", width=300, height=300)
+    layout = column(p, download_button, sizing_mode="scale_both")
  
     # Generate the HTML for the sector graph
     resources = Resources(mode='cdn')
     html4 = file_html(layout, resources=resources,
-                      title=f"Sectors Observed for {object_name}")
+                      title=f"Sectors Observed")
     return html4

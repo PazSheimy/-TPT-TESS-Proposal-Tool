@@ -74,30 +74,17 @@ Technologies used:
                 </form>
             </div>
             <div class="plot1">
-                {{ diagram1|safe }}
+                {{ visualizations.hr_diagram|safe }}
             </div>
             <div class="plot2">
-                {{ diagram2|safe }}
+                {{ visualizations.magnitude_histogram|safe }}
             </div>
             <div class="plot3">
-                {{ diagram4|safe }}
+                {{ visualizations.distance_histogram|safe }}
             </div>
             <div class="plot4">
-                {{ diagram3|safe }}
+                {{ visualizations.sector_graph|safe }}
             </div>
         </div>
-        <script>
-            $(document).ready(function() {
-                $("#search-button").click(function() {
-                    var targetListRadius = $("#target-list-radius").val();
-                    $("<input>").attr({
-                        type: "hidden",
-                        name: "radius",
-                        value: targetListRadius,
-                    }).appendTo("#form-upload-list-graphs");
-                    $("#form-upload-list-graphs").submit();
-                });
-            });
-        </script>  
     </body>
 </html>

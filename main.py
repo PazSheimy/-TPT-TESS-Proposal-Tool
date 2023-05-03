@@ -16,6 +16,7 @@ from routes import register_routes
 from flask import Flask, jsonify, request
 import requests
 from utils.sector_processing import get_ra_dec_from_tic_id, get_targets_from_uploaded_csv
+from flask import send_from_directory
 
 # Create a Flask app instance and register routes
 app = Flask(__name__)
@@ -71,6 +72,14 @@ def lookup_tic():
         print(f"Error in lookup_tic: {e}")
         # Return the error message as a JSON response with a 500 status code
         return jsonify({'error': str(e)}), 500
+
+
+
+
+@app.route('/files_csv/<path:filename>')
+def serve_csv(filename):
+    return send_from_directory('files_csv', filename)
+    
 
 
 if __name__ == "__main__":

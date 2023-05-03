@@ -15,11 +15,13 @@ Dependencies:
 
 from flask import render_template, request
 import requests
-from utils.sector_processing import process_data, get_targets_from_uploaded_csv_diagrams # get_targets_from_uploaded_csv, process_csv
+from utils.sector_processing import process_data, get_targets_from_uploaded_csv_diagrams
 from utils.metadata import get_metadata
-from utils.visualization import generate_magnitude_histogram,hr_diagram,distance_histogram, sector_graph
+from utils.visualization import generate_magnitude_histogram, hr_diagram, distance_histogram, sector_graph
 from astropy.coordinates import SkyCoord
-
+from bokeh.models import ColumnDataSource
+from bokeh.layouts import column
+from bokeh.models.callbacks import CustomJS
 
 def target_visualization_page():
     """
@@ -46,6 +48,7 @@ def target_visualization_page():
 
     return render_template("target_visualization.html", table_visibility=table_visibility)
 
+
 def target_list_page():
     """
     Render the target list page and process the user's input.
@@ -62,6 +65,9 @@ def target_list_page():
         for a GET request.
     """
 
+    visualizations = {}
+    #download_link = None
+
     if request.method == 'POST':
         # Define search radius and retrieve uploaded CSV file
         radius = 0.01
@@ -69,14 +75,11 @@ def target_list_page():
 
         # Process CSV file and retrieve target data
         results = get_targets_from_uploaded_csv_diagrams(csv_file, radius)
-        print(results)#take out after just for debuging
+        print(results)  # take out after just for debuging
 
         # Aggregate data for all cycles
         all_cycles = [result[4] for result in results]
-        
-        # Generate the sector graph with all the results
-        sector_graph_html = sector_graph("All Targets", results, all_cycles)
-        
+
         # Initialize lists for storing target metadata
         all_luminosities = []
         all_temperatures = []
@@ -84,34 +87,66 @@ def target_list_page():
         all_distances = []
 
         # Retrieve metadata for each target
-        coord_list = [SkyCoord(ra=result[0], dec=result[1], unit='deg') for result in results]
+        coord_list = [SkyCoord(ra=result[0], dec=result[1], unit='deg')
+                               for result in results]
         metadata_list = get_metadata(coords=coord_list)
 
         # Process and aggregate metadata
-        for metadata in metadata_list: 
+        for metadata in metadata_list:
             luminosity, temperature, star_name, magnitudes, distance = metadata
             all_luminosities.extend(luminosity)
             all_temperatures.extend(temperature)
             all_magnitudes.extend(magnitudes)
             all_distances.extend(distance)
-        
-        # Generate the HR Diagram for all targets
-        hr_diagram_html = hr_diagram(all_luminosities, all_temperatures, "All Targets")
-        
-        # Generate the magnitude histogram for all targets
-        magnitude_histogram_html = generate_magnitude_histogram("All Targets", all_magnitudes)
-        
-        # Handle missing magnitude data
-        if magnitude_histogram_html is None:
-            magnitude_histogram_html = "No magnitude data available"        
 
-        # Generate the distance histogram for all targets
-        distance_histogram_html = distance_histogram("All Targets", all_distances)
-        
-        # Return the rendered template with generated visualizations
-        return render_template('target_list.html', diagram1=sector_graph_html, diagram2=hr_diagram_html, diagram3=magnitude_histogram_html, diagram4=distance_histogram_html)
+        # Find the maximum length among all lists
+        max_length = max(len(all_temperatures), len(all_luminosities), len(all_magnitudes),
+                         len(all_distances), len(results))
 
-    return render_template('target_list.html')
+        # Ensure all lists have the same length by filling in empty strings
+        all_temperatures += [""] * (max_length - len(all_temperatures))
+        all_luminosities += [""] * (max_length - len(all_luminosities))
+        all_magnitudes += [""] * (max_length - len(all_magnitudes))
+        all_distances += [""] * (max_length - len(all_distances))
+
+        # Get sectors, cycles, cameras, and observation_dates from results
+        sectors = [result[2] for result in results]
+        cycles = [result[3] for result in results]
+        cameras = [result[4] for result in results]
+        observation_dates = [result[5] for result in results]
+
+        # Ensure the lists from results have the same length as the others
+        sectors += [None] * (max_length - len(sectors))
+        cycles += [-1] * (max_length - len(cycles))
+        cameras += [-1] * (max_length - len(cameras))
+        observation_dates += [None] * (max_length - len(observation_dates))
+
+        # Create the common data source
+        common_source = ColumnDataSource(data=dict(
+            temperature=all_temperatures,
+            luminosity=all_luminosities,
+            magnitudes=all_magnitudes,
+            distance=all_distances,
+            sectors=sectors,
+            cycles=cycles,
+            cameras=cameras,
+            observation_dates=observation_dates))
+        
+        
+        
+
+        # Generate visualizationsS
+        visualizations = {
+        'hr_diagram': hr_diagram(common_source, "All Targets"),
+        'magnitude_histogram': generate_magnitude_histogram(ColumnDataSource(data=common_source.data), "All Targets") or "No magnitude data available",
+        'distance_histogram': distance_histogram(ColumnDataSource(data=common_source.data), "All Targets"),
+        'sector_graph': sector_graph(ColumnDataSource(data=dict(
+            sectors=common_source.data['sectors'], cycles=common_source.data['cycles'],
+            cameras=common_source.data['cameras'],
+            observation_dates=common_source.data['observation_dates'])), "All Targets")
+        }
+       
+    return render_template('target_list.html', visualizations=visualizations)
 
 
 

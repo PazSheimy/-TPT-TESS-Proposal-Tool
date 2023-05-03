@@ -1,3 +1,47 @@
+console.log("Starting download.js");
+
+try {
+    // Get the selected data from the source
+    var selected_indices = source.selected.indices;
+    var selected_data = source.data;
+
+    // Create a list to store the CSV data
+    var csv_data = [];
+
+    // Loop through the selected indices and extract the corresponding data
+    for (var i = 0; i < selected_indices.length; i++) {
+        var index = selected_indices[i];
+        var row_data = [
+            selected_data['temperature'][index],
+            selected_data['luminosity'][index],
+            selected_data['magnitudes'][index],
+            selected_data['distance'][index],
+            selected_data['sectors'][index],
+            selected_data['cycles'][index],
+            selected_data['cameras'][index],
+            selected_data['observation_dates'][index],
+        ];
+        csv_data.push(row_data.join(','));
+    }
+
+    // Create a CSV file from the extracted data
+    var csv_string = "temperature,luminosity,magnitudes,distance,sectors,cycles,cameras,observation_dates\n" + csv_data.join('\n');
+    var blob = new Blob([csv_string], { type: 'text/csv;charset=utf-8;' });
+
+    // Create a download link and trigger the download
+    var link = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'selected_data.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+} catch (error) {
+    console.error("Error in download.js:", error);
+}
+
+
 /**
  * Convert a table to CSV format.
  * 
@@ -10,50 +54,59 @@
  */
 
 function table_to_csv(source) {
-    const columns = Object.keys(source.data); //Extracts the column names from the source.data object.
-    const nrows = source.get_length();//Gets the number of rows in the table
-    const lines = [columns.join(',')];//Creates an array with the column names joined by commas as its first element
-  
-    // Gets the selected row indices from the source object.
-    const selected_indices = source.selected.indices;
+    const columns = Object.keys(source.data);
+    const nrows = source.get_length();
+    const lines = [columns.join(',')];
 
-    // Loop through the selected indices
-    /*The outer for loop iterates through the selected row indices, 
-    and the inner for loop iterates through the columns. 
-    For each cell, it gets the value, converts it to a string, 
-    and adds it to a temporary row array. 
-    After processing all columns for a row, 
-    the row array is joined with commas and added to the lines array. */
-    for (let idx of selected_indices) {
-        let row = [];
-        for (let j = 0; j < columns.length; j++) {
-            const column = columns[j];
-            row.push(source.data[column][idx].toString());
-        }
-        lines.push(row.join(','));
+    if (source.selected.indices.length == 0) {
+        console.log("No rows selected, using all row indices");
+        const firstKey = Object.keys(source.data)[0];
+        source.selected.indices = [...Array(source.data[firstKey].length).keys()];
+        console.log("hi",source.selected.indices); // Added this line to print the generated indices array
     }
-    return lines.join('\n').concat('\n');
+    
 }
 
-/**
- * Trigger a download with the specified filename and content.
- * 
- * This function takes a filename and text as arguments and triggers a download
- * with the specified filename and content.
- * 
- * @param {string} filename - The desired name of the downloaded file.
- * @param {string} text - The content to be included in the downloaded file.
- */
-  function download(filename, text) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  }
 
+function download(source) {
+    const filename = 'data_result.csv';
+    const filetext = table_to_csv(source);
+    const blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
+  
+    // Create a temporary link element
+    let link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+  
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+  
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+console.log("hi1")
+button.on_click(function () {
+    console.log("hi2")
+    // If no rows are selected, use all row indices.
+    if (source.selected.indices.length == 0) {
+        console.log("No rows selected, using all row indices");
+        const firstKey = Object.keys(source.data)[0];
+        source.selected.indices = [...Array(source.data[firstKey].length).keys()];
+        console.log("hi",source.selected.indices); // Added this line to print the generated indices array
+    }
+    download(source);
+});
+  
+  
+button.on_click(function () {
+    if (source.selected.indices.length == 0) {
+        source.selected.indices = [...Array(source.data['x'].length).keys()];
+    }
+    download(source);
+});
+  
   // Define the desired name of the downloaded CSV file.
   const filename = 'data.csv';
 

@@ -15,6 +15,8 @@ from io import StringIO
 import csv
 from flask import request, render_template, url_for, make_response, jsonify
 from .sector_processing import process_csv, get_targets_from_uploaded_csv
+import json
+
 
 
 def csv_upload():
@@ -89,37 +91,46 @@ def download():
     
     @returns {Flask Response} - A Flask response containing the generated CSV data for downloading.
     """
-    results = request.args.getlist('results')
 
-    # Create a dictionary to store the data
-    data = {}
-    for result in results:
-        try:
-            ra, dec, sector_number, cycle, camera, obs_date = map(
-                str.strip, result.split(','))
-            ra = float(ra.strip('[]'))
-            dec = float(dec.strip('[]'))
-            if ra not in data:
-                data[ra] = {}
-            if dec not in data[ra]:
-                data[ra][dec] = []
-            data[ra][dec].append([sector_number, cycle, camera, obs_date])
-        except ValueError:
-            pass
+    results_str_list = request.args.getlist('results')
+    results = [json.loads(r.replace("'", '"')) for r in results_str_list]
+
+    # Print the results to check if it contains the correct data
+    print("Results:", results)
+
+    # Check if the results are from a single target input
+    is_single_target = len(results[0]) == 4
 
     # Generate a CSV file from the data
     csv_data = StringIO()
     writer = csv.writer(csv_data)
-    writer.writerow(['RA', 'Dec', 'Sector', 'Camera', 'Cycle', 'Observation Date'])
 
-    for ra, dec_dict in data.items():
-        for dec, row_list in dec_dict.items():
+    # Write the appropriate headers depending on the is_single_target variable
+    if is_single_target:
+        writer.writerow(['Sector', 'Cycle', 'Camera', 'Observation Date'])
+    else:
+        writer.writerow(['RA', 'Dec', 'Sector', 'Cycle', 'Camera', 'Observation Date'])
+
+    # Write the data to the CSV file
+    ra_dec_dict = {}
+    for result in results:
+        if is_single_target:
+            sector_number, camera, cycle, obs_date = result
+            writer.writerow([sector_number, camera, cycle, obs_date])
+        else:
+            ra, dec, sector_number, camera, cycle, obs_date = result
+            if (ra, dec) not in ra_dec_dict:
+                ra_dec_dict[(ra, dec)] = []
+            ra_dec_dict[(ra, dec)].append([sector_number, camera, cycle, obs_date])
+
+    if not is_single_target:
+        for (ra, dec), row_list in ra_dec_dict.items():
             for idx, row in enumerate(row_list):
-                writer.writerow([ra if idx == 0 else '', dec if idx ==
-                                0 else '', *row[:-1], row[-1].rstrip(']')])
+                writer.writerow([ra if idx == 0 else '', dec if idx == 0 else '', *row])
 
     # Return the CSV data as a response
     response = make_response(csv_data.getvalue())
     response.headers['Content-Disposition'] = 'attachment; filename=results.csv'
     response.headers['Content-Type'] = 'text/csv'
     return response
+
