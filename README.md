@@ -59,6 +59,9 @@ python main.py
 
 
 # Usage
+
+[User guide](https://github.com/PazSheimy/-TPT-TESS-Proposal-Tool/blob/main/tptuserguide.docx) avaible here
+
 1- Navigate to the "Sky Map" page to visualize satellite targets on a sky map.
 
 2- You can either search for a specific target by entering its coordinates(ra/dec, tic id or target name), or upload a CSV file containing a list of targets.
